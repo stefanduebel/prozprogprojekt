@@ -3,6 +3,6 @@
 ## Inhalte
 * Datei In- / Output (Level, Highscores)
 * SDL-Nutzung
-** erfassen von Tastatur / Maus-Events
+	* erfassen von Tastatur / Maus-Events
 * Spiele-Logik
 * Zeiterfassung
