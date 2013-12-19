@@ -9,7 +9,6 @@
 
 #include <SDL/SDL_ttf.h>
 
-/* screen dimensions + bit-depth (BPP := bits per pixel) */
 #define SCREEN_WIDTH    		320
 #define SCREEN_HEIGHT   		240
 #define SCREEN_BPP      		32
@@ -18,6 +17,7 @@
 #define BLOCK_SET_WIDTH 		10
 #define BLOCK_SET_HEIGHT		10
 #define BLOCK_SET_SIZE  		(BLOCK_SET_WIDTH * BLOCK_SET_HEIGHT)
+
 
 Uint32 generate_userevent (Uint32 intervall, void *parameter)
 {
@@ -45,8 +45,8 @@ void drawBlock(SDL_Surface *screen, SDL_Surface *bitmap, int x, int y, int shift
 	if(blocktype >= 0 && blocktype <= BLOCK_SET_SIZE)
 	{
 		SDL_Rect source;
-		source.x = blocktype%10*BLOCK_SIZE;
-		source.y = blocktype/10*BLOCK_SIZE;
+		source.x = blocktype%BLOCK_SET_WIDTH*BLOCK_SIZE;
+		source.y = blocktype/BLOCK_SET_HEIGHT*BLOCK_SIZE;
 		source.w = BLOCK_SIZE;
 		source.h = BLOCK_SIZE;
 
@@ -60,8 +60,10 @@ void drawBlock(SDL_Surface *screen, SDL_Surface *bitmap, int x, int y, int shift
 	}
 }
 
+
 int main( int argc, char *argv[] )
 {
+	// Verarbeite Kommandozeilenargumente
 	if(argc > 0)
 	{
 		int argx;
@@ -71,19 +73,6 @@ int main( int argc, char *argv[] )
 		}
 	}
 
-	int quit = 0;
-
-	int playerPositionX = 0;
-	int playerPositionY = 0;
-
-	int camPositionX = 0;
-	int x = 0;
-	int y = 0;
-
-	double v = 0;
-
-	int goLeft = 0;
-	int goRight = 0;
 
 	// Initialisiere SDL
 	if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER ) < 0 ) {
@@ -91,28 +80,72 @@ int main( int argc, char *argv[] )
 		return 1;
 	}
 
+
+	// Timer einrichten
+	SDL_TimerID timer;
+	timer = SDL_AddTimer (16, generate_userevent, NULL);
+
+
+	// Event-System initialisieren
+	SDL_Event event;
+	int quit = 0;
+
+
 	// Erstelle die Bildschirmfläche
 	SDL_Surface *screen = NULL;
-	screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE);
+	screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF);
 
-	// Definiere Hintergrundfarbe
+
+	// Hintergrund
 	Uint32 color;
 	color = SDL_MapRGB( screen->format, 0, 0, 0 );
-
-	// Bitmaps laden
-	SDL_Surface *player = SDL_LoadBMP("images/player.bmp");
-
-	SDL_Surface *blockset = SDL_LoadBMP("images/test.bmp");
 
 	SDL_Surface *background = SDL_LoadBMP("images/background.bmp");
 	int backgroundHeight = 240;
 	int backgroundWidth = 647;
 
-	/* Den Timer auf 20ms stellen und starten */
-	SDL_TimerID timer;
-	timer = SDL_AddTimer (16, generate_userevent, NULL);
 
-	SDL_Event event;
+	// Welt
+	SDL_Surface *blockset = SDL_LoadBMP("images/test.bmp");
+
+	int worldSizeX = 40;
+	int worldSizeY = 15;
+	int world[15][40] =
+	{{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+	 {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+	 {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+	 {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+	 {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+	 {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+	 {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+	 {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+	 {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+	 { 0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+	 { 0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+	 { 0, 0,-1,-1,-1,-1,-1,-1, 0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+	 { 0, 0, 0,-1,-1,-1, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+	 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1, 0, 0, 0, 0, 0},
+	 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1, 0, 0, 0, 0, 0}};
+
+	int x;
+	int y;
+
+
+	// Spieler
+	SDL_Surface *player = SDL_LoadBMP("images/player.bmp");
+
+	int playerPositionX = 0;
+	int playerPositionY = 0;
+
+	int goLeft = 0;
+	int goRight = 0;
+	double v = 0;
+
+
+	// Kamera
+	int camPositionX = 0;
+
+
 	while(SDL_WaitEvent (&event))
 	{
 		switch(event.type)
@@ -124,40 +157,48 @@ int main( int argc, char *argv[] )
 			}
 			case SDL_USEREVENT:
 			{
+				// Spielerbewegung
 				playerPositionX = playerPositionX + (goRight - goLeft) * 3;
 
 				if(playerPositionX < 0)
-				{
-					playerPositionX = 0;
-				}
-				if(playerPositionX > 1600-BLOCK_SIZE)
-				{
-					playerPositionX = 1600-BLOCK_SIZE;
-				}
+				{playerPositionX = 0;}
+				else if(playerPositionX > (worldSizeX-1)*BLOCK_SIZE)
+				{playerPositionX = (worldSizeX-1)*BLOCK_SIZE;}
 
-				v += 9.81/60;
+				v += 0.2;
 				playerPositionY += v;
 
-				if(playerPositionY >= 9*16)
-				{
-					playerPositionY = 9*16;
-					v=0;
-				}
 
+				// Y-Collision
+				if(world[playerPositionY/BLOCK_SIZE+1][playerPositionX/BLOCK_SIZE] >= 0)
+				{playerPositionY = playerPositionY-playerPositionY%BLOCK_SIZE;  v = 0;}
+				if(playerPositionX%BLOCK_SIZE && world[playerPositionY/BLOCK_SIZE+1][playerPositionX/BLOCK_SIZE+1] >= 0)
+				{playerPositionY = playerPositionY-playerPositionY%BLOCK_SIZE; v = 0;}
+
+				// X-Collision
+				if(world[playerPositionY/BLOCK_SIZE][playerPositionX/BLOCK_SIZE] >= 0)
+				{playerPositionX = playerPositionX-playerPositionX%BLOCK_SIZE+BLOCK_SIZE;}
+				if(playerPositionY%BLOCK_SIZE && world[playerPositionY/BLOCK_SIZE+1][playerPositionX/BLOCK_SIZE] >= 0)
+				{playerPositionX = playerPositionX-playerPositionX%BLOCK_SIZE+BLOCK_SIZE;}
+
+				if(world[playerPositionY/BLOCK_SIZE][playerPositionX/BLOCK_SIZE+1] >= 0)
+				{playerPositionX = playerPositionX-playerPositionX%BLOCK_SIZE;}
+				if(playerPositionY%BLOCK_SIZE && world[playerPositionY/BLOCK_SIZE+1][playerPositionX/BLOCK_SIZE+1] >= 0)
+				{playerPositionX = playerPositionX-playerPositionX%BLOCK_SIZE;}
+
+
+				// Kamera
 				camPositionX += ((playerPositionX - SCREEN_WIDTH / 2 + BLOCK_SIZE / 2) - camPositionX) / 10;
-				//camPositionX = playerPositionX;
 
 				if(camPositionX < 0)
-				{
-					camPositionX = 0;
-				}
-				if(camPositionX > 1600-SCREEN_WIDTH)
-				{
-					camPositionX = 1600-SCREEN_WIDTH;
-				}
+				{camPositionX = 0;}
+				else if(camPositionX > worldSizeX*BLOCK_SIZE-SCREEN_WIDTH)
+				{camPositionX = worldSizeX*BLOCK_SIZE-SCREEN_WIDTH;}
+
 
 				// Lösche den Hintergrund
 				SDL_FillRect( screen, NULL, color );
+
 
 				// Zeichne das Hintergrundbild
 				SDL_Rect background_source;
@@ -174,14 +215,16 @@ int main( int argc, char *argv[] )
 
 				SDL_BlitSurface(background, &background_source, screen, &background_destination);
 
+
 				// Zeichne alle Blöcke ein
-				for(y = 10; y < SCREEN_HEIGHT/BLOCK_SIZE; y++)
+				for(y = 0; y < SCREEN_HEIGHT/BLOCK_SIZE; y++)
 				{
 					for(x = camPositionX/BLOCK_SIZE; x < camPositionX/BLOCK_SIZE+SCREEN_WIDTH/BLOCK_SIZE+1; x++)
 					{
-						drawBlock(screen, blockset, x, y, camPositionX, x);
+						drawBlock(screen, blockset, x, y, camPositionX, world[y][x]);
 					}
 				}
+
 
 				// Zeichne den Spieler
 				SDL_Rect player_source;
@@ -197,6 +240,7 @@ int main( int argc, char *argv[] )
 				player_destination.h = BLOCK_SIZE;
 
 				SDL_BlitSurface(player, &player_source, screen, &player_destination);
+
 
 				// Zeichne das berechnete Bild
 				SDL_Flip( screen );
@@ -215,6 +259,9 @@ int main( int argc, char *argv[] )
 					case SDLK_SPACE:
 						if(v == 0)
 							{v = -3;}
+						break;
+					case SDLK_ESCAPE:
+						quit = 1;
 						break;
 					default:
 						break;
@@ -244,5 +291,5 @@ int main( int argc, char *argv[] )
 	SDL_Quit();
 
 	return 0;
-
 }
+
