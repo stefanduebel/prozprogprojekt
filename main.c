@@ -9,11 +9,11 @@
 
 #include <SDL/SDL_ttf.h>
 
-#define SCREEN_WIDTH    		320
-#define SCREEN_HEIGHT   		240
+#define SCREEN_WIDTH    		1280
+#define SCREEN_HEIGHT   		720
 #define SCREEN_BPP      		32
 
-#define BLOCK_SIZE      		16
+#define BLOCK_SIZE      		48
 #define BLOCK_SET_WIDTH 		10
 #define BLOCK_SET_HEIGHT		10
 #define BLOCK_SET_SIZE  		(BLOCK_SET_WIDTH * BLOCK_SET_HEIGHT)
@@ -60,6 +60,17 @@ void drawBlock(SDL_Surface *screen, SDL_Surface *bitmap, int x, int y, int shift
 	}
 }
 
+int getBlock(int *world, int worldSizeX, int worldSizeY, int y, int x)
+{
+	if(x >= 0 && x < worldSizeX && y >= 0 && y < worldSizeY)
+	{
+		return world[worldSizeX*y+x];
+	}
+	else
+	{
+		return -1;
+	}
+}
 
 int main( int argc, char *argv[] )
 {
@@ -81,9 +92,15 @@ int main( int argc, char *argv[] )
 	}
 
 
+	// Erstelle die Bildschirmfläche
+	SDL_Surface *screen = NULL;
+	screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
+	SDL_ShowCursor(0);
+
+
 	// Timer einrichten
 	SDL_TimerID timer;
-	timer = SDL_AddTimer (16, generate_userevent, NULL);
+	timer = SDL_AddTimer (32, generate_userevent, NULL);
 
 
 	// Event-System initialisieren
@@ -91,18 +108,13 @@ int main( int argc, char *argv[] )
 	int quit = 0;
 
 
-	// Erstelle die Bildschirmfläche
-	SDL_Surface *screen = NULL;
-	screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF);
-
-
 	// Hintergrund
 	Uint32 color;
 	color = SDL_MapRGB( screen->format, 0, 0, 0 );
 
 	SDL_Surface *background = SDL_LoadBMP("images/background.bmp");
-	int backgroundHeight = 240;
-	int backgroundWidth = 647;
+	int backgroundWidth = 2560;
+	int backgroundHeight = 720;
 
 
 	// Welt
@@ -116,7 +128,7 @@ int main( int argc, char *argv[] )
 	 {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 	 {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 	 {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
-	 {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+	 {-1,-1,-1,-1,-1,-1,-1,-1, 0, 0, 0, 0, 1, 2, 3, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 	 {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 	 {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 	 {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
@@ -124,8 +136,8 @@ int main( int argc, char *argv[] )
 	 { 0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 	 { 0, 0,-1,-1,-1,-1,-1,-1, 0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 	 { 0, 0, 0,-1,-1,-1, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
-	 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1, 0, 0, 0, 0, 0},
-	 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1, 0, 0, 0, 0, 0}};
+	 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1, 0, 0, 0, 0},
+	 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1, 0, 0, 0, 0}};
 
 	int x;
 	int y;
@@ -140,6 +152,7 @@ int main( int argc, char *argv[] )
 	int goLeft = 0;
 	int goRight = 0;
 	double v = 0;
+	double a = 0.6;
 
 
 	// Kamera
@@ -158,33 +171,46 @@ int main( int argc, char *argv[] )
 			case SDL_USEREVENT:
 			{
 				// Spielerbewegung
-				playerPositionX = playerPositionX + (goRight - goLeft) * 3;
+				playerPositionX = playerPositionX + (goRight - goLeft) * 9;
 
 				if(playerPositionX < 0)
 				{playerPositionX = 0;}
 				else if(playerPositionX > (worldSizeX-1)*BLOCK_SIZE)
 				{playerPositionX = (worldSizeX-1)*BLOCK_SIZE;}
 
-				v += 0.2;
+
+				// X-Collision
+				if(getBlock(world, worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE, playerPositionX/BLOCK_SIZE) >= 0)
+				{playerPositionX = playerPositionX-playerPositionX%BLOCK_SIZE+BLOCK_SIZE;}
+				if(playerPositionY%BLOCK_SIZE && getBlock(world, worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE+1, playerPositionX/BLOCK_SIZE) >= 0)
+				{playerPositionX = playerPositionX-playerPositionX%BLOCK_SIZE+BLOCK_SIZE;}
+
+				if(getBlock(world, worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE, playerPositionX/BLOCK_SIZE+1) >= 0)
+				{playerPositionX = playerPositionX-playerPositionX%BLOCK_SIZE;}
+				if(playerPositionY%BLOCK_SIZE && getBlock(world, worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE+1, playerPositionX/BLOCK_SIZE+1) >= 0)
+				{playerPositionX = playerPositionX-playerPositionX%BLOCK_SIZE;}
+
+
+				// Schwerkraft
+				v += a;
 				playerPositionY += v;
 
 
 				// Y-Collision
-				if(world[playerPositionY/BLOCK_SIZE+1][playerPositionX/BLOCK_SIZE] >= 0)
+				if(getBlock(world, worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE+1, playerPositionX/BLOCK_SIZE) >= 0)
 				{playerPositionY = playerPositionY-playerPositionY%BLOCK_SIZE;  v = 0;}
-				if(playerPositionX%BLOCK_SIZE && world[playerPositionY/BLOCK_SIZE+1][playerPositionX/BLOCK_SIZE+1] >= 0)
+				if(playerPositionX%BLOCK_SIZE && getBlock(world, worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE+1, playerPositionX/BLOCK_SIZE+1) >= 0)
 				{playerPositionY = playerPositionY-playerPositionY%BLOCK_SIZE; v = 0;}
 
-				// X-Collision
-				if(world[playerPositionY/BLOCK_SIZE][playerPositionX/BLOCK_SIZE] >= 0)
-				{playerPositionX = playerPositionX-playerPositionX%BLOCK_SIZE+BLOCK_SIZE;}
-				if(playerPositionY%BLOCK_SIZE && world[playerPositionY/BLOCK_SIZE+1][playerPositionX/BLOCK_SIZE] >= 0)
-				{playerPositionX = playerPositionX-playerPositionX%BLOCK_SIZE+BLOCK_SIZE;}
 
-				if(world[playerPositionY/BLOCK_SIZE][playerPositionX/BLOCK_SIZE+1] >= 0)
-				{playerPositionX = playerPositionX-playerPositionX%BLOCK_SIZE;}
-				if(playerPositionY%BLOCK_SIZE && world[playerPositionY/BLOCK_SIZE+1][playerPositionX/BLOCK_SIZE+1] >= 0)
-				{playerPositionX = playerPositionX-playerPositionX%BLOCK_SIZE;}
+				// 
+				if(playerPositionY < 0-BLOCK_SIZE || playerPositionY > worldSizeY*BLOCK_SIZE)
+				{
+					playerPositionX = 0;
+					playerPositionY = 0;
+					a = 0.6;
+					v = 0;
+				}
 
 
 				// Kamera
@@ -202,7 +228,7 @@ int main( int argc, char *argv[] )
 
 				// Zeichne das Hintergrundbild
 				SDL_Rect background_source;
-				background_source.x = (int) ( (((double)camPositionX/(1600-SCREEN_WIDTH))) * (backgroundWidth-SCREEN_WIDTH) );
+				background_source.x = (int) ( (((double)camPositionX/(worldSizeX*BLOCK_SIZE-SCREEN_WIDTH))) * (backgroundWidth-SCREEN_WIDTH) );
 				background_source.y = 0;
 				background_source.w = SCREEN_WIDTH;
 				background_source.h = SCREEN_HEIGHT;
@@ -221,7 +247,7 @@ int main( int argc, char *argv[] )
 				{
 					for(x = camPositionX/BLOCK_SIZE; x < camPositionX/BLOCK_SIZE+SCREEN_WIDTH/BLOCK_SIZE+1; x++)
 					{
-						drawBlock(screen, blockset, x, y, camPositionX, world[y][x]);
+						drawBlock(screen, blockset, x, y, camPositionX, getBlock(world, worldSizeX, worldSizeY, y, x));
 					}
 				}
 
@@ -258,7 +284,10 @@ int main( int argc, char *argv[] )
 						break;
 					case SDLK_SPACE:
 						if(v == 0)
-							{v = -3;}
+							{v = -9;}
+						break;
+					case SDLK_UP:
+						a *= -1;
 						break;
 					case SDLK_ESCAPE:
 						quit = 1;
