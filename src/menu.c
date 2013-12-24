@@ -15,11 +15,13 @@
 
 int draw_menu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 {
+	// Färbe den Hintergrund schwarz
 	SDL_FillRect(screen, &screen->clip_rect, SDL_MapRGB(screen->format, 0, 0, 0));
 
+	// Farben für die Schrift der Menüeinträge (standard und ausgewählt)
 	SDL_Color color[2] = {{255,255,255,0},{0,255,0,0}};
 
-	// Struktur für einen einzelnen Menüeintrag (Name, Render-Fläche, Position, Status)
+	// Struktur für einen einzelnen Menüeintrag (Name, Render-Fläche, Position)
 	struct menu
 	{
 		char *name;
@@ -27,24 +29,29 @@ int draw_menu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 		SDL_Rect position;
 	} menu_item[MENU_ITEMS];
 
+	// ausgewählter Menü-Eintrag
 	short selected_item = 0;
 
 	// initialisiere Namen der Einträge
-	menu_item[0].name = "Starte Spiel";
+	menu_item[0].name = "Starte Spiel"; 
 	menu_item[1].name = "Highscores";
 	menu_item[2].name = "Level Auswahl";
 	menu_item[3].name = "Spiel beenden";
 
+	// Gesamthöhe des Menüs, zunächst nur die Zwischenräume
 	unsigned int menu_height = (MENU_ITEMS - 1) * MENU_PADDING;
-	
+
+	// rendere die einzelnen Menüeinträge in ihre jeweiligen Surfaces und bestimme die Gesamthöhe des Menüs
 	for (int i = 0; i < MENU_ITEMS; i++)
 	{
-		// rendere die Schrift
 		menu_item[i].surface = TTF_RenderText_Solid(font, menu_item[i].name, color[(i == selected_item)]);
 		menu_height += menu_item[i].surface->clip_rect.h;
 	}
 
+	// bereits ausgegebene Menühöhe
 	unsigned int printed_height = 0;
+
+	// bestimme die x und y Koordinaten der einzelnen Einträge, zeige diese dann auf dem screen an
 	for (int i = 0; i < MENU_ITEMS; i++)
 	{
 		// position der einzelnen Menü-Einträge bestimmen
@@ -56,24 +63,30 @@ int draw_menu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 	}
 
 
-
-
+	// warte auf Events
 	while(SDL_WaitEvent (&event))
 	{
 		switch(event.type)
 		{
+			// behandle Timer-Event
 			case SDL_USEREVENT:
+				// rendere den Bildschirm neu (Hintergrundanimation wäre möglich)
 				SDL_Flip(screen);
 				break;
 
+			// behandle Tastendruck
 			case SDL_KEYDOWN:
 			{
 				switch(event.key.keysym.sym)
 				{
+					// Pfeil hoch
 					case SDLK_UP:
 						selected_item--;
+						// wenn oberster Eintrag gehe zum untersten
 						if (selected_item < 0)
 							selected_item = MENU_ITEMS - 1;
+
+						// zeichne alle Einträge neu
 						for (int i = 0; i < MENU_ITEMS; i++)
 						{
 							menu_item[i].surface = TTF_RenderText_Solid(font, menu_item[i].name, color[(i == selected_item)]);
@@ -81,9 +94,13 @@ int draw_menu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 						}
 						break;
 
+					// Pfeil runter
 					case SDLK_DOWN:
 						selected_item++;
+						// wenn unterster Eintrag gehe zum obersten
 						selected_item %= MENU_ITEMS;
+
+						// zeichne alle Einträge neu
 						for (int i = 0; i < MENU_ITEMS; i++)
 						{
 							menu_item[i].surface = TTF_RenderText_Solid(font, menu_item[i].name, color[(i == selected_item)]);
@@ -91,7 +108,9 @@ int draw_menu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 						}
 						break;
 
+					// Bestätigen-Taste
 					case SDLK_RETURN:
+						// gebe ausgewählten Eintrag zurück
 						return selected_item;
 
 					default:

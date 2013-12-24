@@ -49,6 +49,7 @@ int main( int argc, char *argv[] )
 	{
 		printf("TTF_Init() Failed: %s\n", TTF_GetError());
 		SDL_Quit();
+		exit(1);
 	}
 
 	font = TTF_OpenFont("resources/fonts/DejaVuSans.ttf", FONT_SIZE);
