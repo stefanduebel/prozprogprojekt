@@ -49,7 +49,6 @@ int main( int argc, char *argv[] )
 	{
 		printf("TTF_Init() Failed: %s\n", TTF_GetError());
 		SDL_Quit();
-		exit(1);
 	}
 
 	font = TTF_OpenFont("resources/fonts/DejaVuSans.ttf", FONT_SIZE);
@@ -68,12 +67,10 @@ int main( int argc, char *argv[] )
 	}
 
 	// Timer einrichten
-	SDL_TimerID timer;
-	timer = SDL_AddTimer (16, generate_userevent, NULL);
+	SDL_AddTimer (16, generate_userevent, NULL);
 
 	// Event-System initialisieren
 	SDL_Event event;
-	int quit = 0;
 
 	// Erstelle die Bildschirmfläche
 	SDL_Surface *screen = NULL;

@@ -17,7 +17,7 @@ int draw_menu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 {
 	SDL_FillRect(screen, &screen->clip_rect, SDL_MapRGB(screen->format, 0, 0, 0));
 
-	SDL_Color color[2] = {{255,255,255},{0,255,0}};
+	SDL_Color color[2] = {{255,255,255,0},{0,255,0,0}};
 
 	// Struktur für einen einzelnen Menüeintrag (Name, Render-Fläche, Position, Status)
 	struct menu

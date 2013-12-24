@@ -130,14 +130,14 @@ int start_game(SDL_Surface *screen, SDL_Event event)
 
 
 				// X-Collision
-				if(getBlock(world, worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE, playerPositionX/BLOCK_SIZE) >= 0)
+				if(getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE, playerPositionX/BLOCK_SIZE) >= 0)
 				{playerPositionX = playerPositionX-playerPositionX%BLOCK_SIZE+BLOCK_SIZE;}
-				if(playerPositionY%BLOCK_SIZE && getBlock(world, worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE+1, playerPositionX/BLOCK_SIZE) >= 0)
+				if(playerPositionY%BLOCK_SIZE && getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE+1, playerPositionX/BLOCK_SIZE) >= 0)
 				{playerPositionX = playerPositionX-playerPositionX%BLOCK_SIZE+BLOCK_SIZE;}
 
-				if(getBlock(world, worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE, playerPositionX/BLOCK_SIZE+1) >= 0)
+				if(getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE, playerPositionX/BLOCK_SIZE+1) >= 0)
 				{playerPositionX = playerPositionX-playerPositionX%BLOCK_SIZE;}
-				if(playerPositionY%BLOCK_SIZE && getBlock(world, worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE+1, playerPositionX/BLOCK_SIZE+1) >= 0)
+				if(playerPositionY%BLOCK_SIZE && getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE+1, playerPositionX/BLOCK_SIZE+1) >= 0)
 				{playerPositionX = playerPositionX-playerPositionX%BLOCK_SIZE;}
 
 
@@ -147,9 +147,9 @@ int start_game(SDL_Surface *screen, SDL_Event event)
 
 
 				// Y-Collision
-				if(getBlock(world, worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE+1, playerPositionX/BLOCK_SIZE) >= 0)
+				if(getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE+1, playerPositionX/BLOCK_SIZE) >= 0)
 				{playerPositionY = playerPositionY-playerPositionY%BLOCK_SIZE;  v = 0;}
-				if(playerPositionX%BLOCK_SIZE && getBlock(world, worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE+1, playerPositionX/BLOCK_SIZE+1) >= 0)
+				if(playerPositionX%BLOCK_SIZE && getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE+1, playerPositionX/BLOCK_SIZE+1) >= 0)
 				{playerPositionY = playerPositionY-playerPositionY%BLOCK_SIZE; v = 0;}
 
 
@@ -197,7 +197,7 @@ int start_game(SDL_Surface *screen, SDL_Event event)
 				{
 					for(x = camPositionX/BLOCK_SIZE; x < camPositionX/BLOCK_SIZE+SCREEN_WIDTH/BLOCK_SIZE+1; x++)
 					{
-						drawBlock(screen, blockset, x, y, camPositionX, getBlock(world, worldSizeX, worldSizeY, y, x));
+						drawBlock(screen, blockset, x, y, camPositionX, getBlock(&world[0][0], worldSizeX, worldSizeY, y, x));
 					}
 				}
 
@@ -266,4 +266,6 @@ int start_game(SDL_Surface *screen, SDL_Event event)
 
 		if(quit){return 0;}
 	}
+
+	return 1;
 }
