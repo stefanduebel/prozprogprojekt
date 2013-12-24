@@ -9,36 +9,18 @@
 
 #include <SDL/SDL_ttf.h>
 
+#include "game.h"
+
 #define SCREEN_WIDTH    		1280
 #define SCREEN_HEIGHT   		720
 #define SCREEN_BPP      		32
+
+#define FONT_SIZE 16
 
 #define BLOCK_SIZE      		48
 #define BLOCK_SET_WIDTH 		10
 #define BLOCK_SET_HEIGHT		10
 #define BLOCK_SET_SIZE  		(BLOCK_SET_WIDTH * BLOCK_SET_HEIGHT)
-
-
-Uint32 generate_userevent (Uint32 intervall, void *parameter)
-{
-	SDL_Event event;
-	SDL_UserEvent userevent;
-
-	/* initialisiere einen UserEvent */
-	userevent.type = SDL_USEREVENT;
-	userevent.code = 0;
-	userevent.data1 = NULL;
-	userevent.data2 = NULL; 
-
-	/* ... initialisiere damit einen Event */
-	event.type = SDL_USEREVENT;
-	event.user = userevent;
-
-	/* neuen Event erzeugen */
-	SDL_PushEvent (&event);
-	return intervall;
-}
-
 
 void drawBlock(SDL_Surface *screen, SDL_Surface *bitmap, int x, int y, int shift, int blocktype)
 {
@@ -72,53 +54,21 @@ int getBlock(int *world, int worldSizeX, int worldSizeY, int y, int x)
 	}
 }
 
-int main( int argc, char *argv[] )
+int start_game(SDL_Surface *screen, SDL_Event event)
 {
-	// Verarbeite Kommandozeilenargumente
-	if(argc > 0)
-	{
-		int argx;
-		for(argx = 0; argx < argc; argx++)
-		{
-			printf("%s\n", argv[argx]);
-		}
-	}
-
-
-	// Initialisiere SDL
-	if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER ) < 0 ) {
-		fprintf( stderr, "SDL konnte nicht initialisiert werden:  %s\n", SDL_GetError() );
-		return 1;
-	}
-
-
-	// Erstelle die Bildschirmfläche
-	SDL_Surface *screen = NULL;
-	screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
-	SDL_ShowCursor(0);
-
-
-	// Timer einrichten
-	SDL_TimerID timer;
-	timer = SDL_AddTimer (32, generate_userevent, NULL);
-
-
-	// Event-System initialisieren
-	SDL_Event event;
-	int quit = 0;
-
-
 	// Hintergrund
 	Uint32 color;
 	color = SDL_MapRGB( screen->format, 0, 0, 0 );
 
-	SDL_Surface *background = SDL_LoadBMP("images/background.bmp");
+	SDL_Surface *background = SDL_LoadBMP("resources/images/background.bmp");
 	int backgroundWidth = 2560;
 	int backgroundHeight = 720;
 
+	int quit = 0;
+
 
 	// Welt
-	SDL_Surface *blockset = SDL_LoadBMP("images/test.bmp");
+	SDL_Surface *blockset = SDL_LoadBMP("resources/images/test.bmp");
 
 	int worldSizeX = 40;
 	int worldSizeY = 15;
@@ -144,7 +94,7 @@ int main( int argc, char *argv[] )
 
 
 	// Spieler
-	SDL_Surface *player = SDL_LoadBMP("images/player.bmp");
+	SDL_Surface *player = SDL_LoadBMP("resources/images/player.bmp");
 
 	int playerPositionX = 0;
 	int playerPositionY = 0;
@@ -314,11 +264,6 @@ int main( int argc, char *argv[] )
 			}
 		}
 
-		if(quit){break;}
+		if(quit){return 0;}
 	}
-
-	SDL_Quit();
-
-	return 0;
 }
-
