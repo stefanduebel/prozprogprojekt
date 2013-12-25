@@ -26,24 +26,28 @@ void drawBlock(SDL_Surface *screen, SDL_Surface *bitmap, int x, int y, int shift
 {
 	if(blocktype >= 0 && blocktype <= BLOCK_SET_SIZE)
 	{
+		// Ausschnitt aus der Blöckebitmap welche einen Block beinhaltet
 		SDL_Rect source;
 		source.x = blocktype%BLOCK_SET_WIDTH*BLOCK_SIZE;
 		source.y = blocktype/BLOCK_SET_HEIGHT*BLOCK_SIZE;
 		source.w = BLOCK_SIZE;
 		source.h = BLOCK_SIZE;
 
+		// Ausschnitt aus dem Bildschirminhalt wo der Block gezeichnet werden soll
 		SDL_Rect destination;
 		destination.x = x*BLOCK_SIZE-shift;
 		destination.y = y*BLOCK_SIZE;
 		destination.w = BLOCK_SIZE;
 		destination.h = BLOCK_SIZE;
 
+		// Block auf den Screen zeichnen
 		SDL_BlitSurface(bitmap, &source, screen, &destination);
 	}
 }
 
 int getBlock(int *world, int worldSizeX, int worldSizeY, int y, int x)
 {
+	// wenn existierender Block den Typ zurückgeben
 	if(x >= 0 && x < worldSizeX && y >= 0 && y < worldSizeY)
 	{
 		return world[worldSizeX*y+x];
@@ -60,16 +64,17 @@ int start_game(SDL_Surface *screen, SDL_Event event)
 	Uint32 color;
 	color = SDL_MapRGB( screen->format, 0, 0, 0 );
 
+	// Lade Hintergrundgrafik
 	SDL_Surface *background = SDL_LoadBMP("resources/images/background.bmp");
-	int backgroundWidth = 2560;
-	int backgroundHeight = 720;
+
 
 	int quit = 0;
 
 
-	// Welt
+	// Lade Grafik für die Blöcke
 	SDL_Surface *blockset = SDL_LoadBMP("resources/images/test.bmp");
 
+	// initialisiere die Welt (dies soll eigentlich aus einer Textdatei geladen werden)
 	int worldSizeX = 40;
 	int worldSizeY = 15;
 	int world[15][40] =
@@ -93,7 +98,7 @@ int start_game(SDL_Surface *screen, SDL_Event event)
 	int y;
 
 
-	// Spieler
+	// lade Grafik für den Spieler
 	SDL_Surface *player = SDL_LoadBMP("resources/images/player.bmp");
 
 	int playerPositionX = 0;
@@ -101,28 +106,33 @@ int start_game(SDL_Surface *screen, SDL_Event event)
 
 	int goLeft = 0;
 	int goRight = 0;
-	double v = 0;
-	double a = 0.6;
+	double v = 0; // Vertikalgeschwindigkeit
+	double a = 0.6; // Gravitation
 
 
 	// Kamera
 	int camPositionX = 0;
 
 
+	// auf SDL-Events warten
 	while(SDL_WaitEvent (&event))
 	{
 		switch(event.type)
 		{
+			// Quit-Event: quit-Flag setzen
 			case SDL_QUIT:
 			{
 				quit = 1;
 				break;
 			}
+
+			// Timer-Event: Bildschirm neu zeichnen
 			case SDL_USEREVENT:
 			{
 				// Spielerbewegung
 				playerPositionX = playerPositionX + (goRight - goLeft) * 9;
 
+				// Kontrollieren ob Welt verlassen wurde
 				if(playerPositionX < 0)
 				{playerPositionX = 0;}
 				else if(playerPositionX > (worldSizeX-1)*BLOCK_SIZE)
@@ -132,11 +142,14 @@ int start_game(SDL_Surface *screen, SDL_Event event)
 				// X-Collision
 				if(getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE, playerPositionX/BLOCK_SIZE) >= 0)
 				{playerPositionX = playerPositionX-playerPositionX%BLOCK_SIZE+BLOCK_SIZE;}
+				// verhindere das setzen auf einen Block wenn man gegen diesen springt
 				if(playerPositionY%BLOCK_SIZE && getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE+1, playerPositionX/BLOCK_SIZE) >= 0)
 				{playerPositionX = playerPositionX-playerPositionX%BLOCK_SIZE+BLOCK_SIZE;}
 
+				// X-Kollision von der anderen Seite
 				if(getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE, playerPositionX/BLOCK_SIZE+1) >= 0)
 				{playerPositionX = playerPositionX-playerPositionX%BLOCK_SIZE;}
+				// verhindere das setzen auf einen Block wenn man gegen diesen springt
 				if(playerPositionY%BLOCK_SIZE && getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE+1, playerPositionX/BLOCK_SIZE+1) >= 0)
 				{playerPositionX = playerPositionX-playerPositionX%BLOCK_SIZE;}
 
@@ -146,14 +159,14 @@ int start_game(SDL_Surface *screen, SDL_Event event)
 				playerPositionY += v;
 
 
-				// Y-Collision
+				// Y-Collision: nicht durch Blöcke hindurchfallen
 				if(getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE+1, playerPositionX/BLOCK_SIZE) >= 0)
 				{playerPositionY = playerPositionY-playerPositionY%BLOCK_SIZE;  v = 0;}
 				if(playerPositionX%BLOCK_SIZE && getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/BLOCK_SIZE+1, playerPositionX/BLOCK_SIZE+1) >= 0)
 				{playerPositionY = playerPositionY-playerPositionY%BLOCK_SIZE; v = 0;}
 
 
-				// 
+				// in vertikaler Richtung aus der Welt: zum Start zurücksetzen
 				if(playerPositionY < 0-BLOCK_SIZE || playerPositionY > worldSizeY*BLOCK_SIZE)
 				{
 					playerPositionX = 0;
@@ -177,19 +190,24 @@ int start_game(SDL_Surface *screen, SDL_Event event)
 
 
 				// Zeichne das Hintergrundbild
+				// sichtbarer Ausschnitt des Bildes
 				SDL_Rect background_source;
-				background_source.x = (int) ( (((double)camPositionX/(worldSizeX*BLOCK_SIZE-SCREEN_WIDTH))) * (backgroundWidth-SCREEN_WIDTH) );
+				background_source.x = (int) ( (((double)camPositionX/(worldSizeX*BLOCK_SIZE-SCREEN_WIDTH))) * (background->clip_rect.w-SCREEN_WIDTH) );
 				background_source.y = 0;
 				background_source.w = SCREEN_WIDTH;
 				background_source.h = SCREEN_HEIGHT;
 
-				SDL_Rect background_destination;
-				background_destination.x = 0;
-				background_destination.y = 0;
-				background_destination.w = SCREEN_WIDTH;
-				background_destination.h = SCREEN_HEIGHT;
+				// gesamter Screen
+				//~SDL_Rect background_destination;
+				//~background_destination.x = 0;
+				//~background_destination.y = 0;
+				//~background_destination.w = SCREEN_WIDTH;
+				//~background_destination.h = SCREEN_HEIGHT;
 
-				SDL_BlitSurface(background, &background_source, screen, &background_destination);
+				//~SDL_BlitSurface(background, &background_source, screen, &background_destination);
+
+				// zeichne den Ausschnitt auf den gesamten Screen
+				SDL_BlitSurface(background, &background_source, screen, NULL);
 
 
 				// Zeichne alle Blöcke ein
@@ -222,31 +240,39 @@ int start_game(SDL_Surface *screen, SDL_Event event)
 				SDL_Flip( screen );
 				break;
 			}
+			// Tasten gedrückt
 			case SDL_KEYDOWN:
 			{
 				switch(event.key.keysym.sym)
 				{
+					// Pfeil-Links
 					case SDLK_LEFT:
 						goLeft = 1;
 						break;
+					// Pfeil-Rechts
 					case SDLK_RIGHT:
 						goRight = 1;
 						break;
+					// Leertaster
 					case SDLK_SPACE:
 						if(v == 0)
 							{v = -9;}
 						break;
+					// Pfeil hoch
 					case SDLK_UP:
 						a *= -1;
 						break;
+					// Escape
 					case SDLK_ESCAPE:
 						quit = 1;
 						break;
+					// alles andere ignorieren
 					default:
 						break;
 				}
 				break;
 			}
+			// Taste losgelassen
 			case SDL_KEYUP:
 			{
 				switch(event.key.keysym.sym)
@@ -264,6 +290,7 @@ int start_game(SDL_Surface *screen, SDL_Event event)
 			}
 		}
 
+		// wenn das quit-Flag gesetzt ist beenden
 		if(quit){return 0;}
 	}
 
