@@ -12,8 +12,6 @@
 
 #include "game.h"
 
-#define SCREEN_WIDTH    		1280
-#define SCREEN_HEIGHT   		720
 #define SCREEN_BPP      		32
 
 #define FONT_SIZE 16
@@ -112,7 +110,7 @@ int start_game(SDL_Surface *screen, SDL_Event event, struct resolution res)
 	int goLeft = 0;
 	int goRight = 0;
 	double v = 0; // Vertikalgeschwindigkeit
-	double a = 0.6; // Gravitation
+	double a = 0.6 * (48 / (double) block_size); // Gravitation
 
 
 	// Kamera
