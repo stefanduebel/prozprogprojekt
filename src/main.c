@@ -19,7 +19,6 @@
 
 #define FONT_SIZE 16
 
-
 Uint32 generate_userevent (Uint32 intervall, void *parameter)
 {
 	SDL_Event event;
@@ -42,6 +41,19 @@ Uint32 generate_userevent (Uint32 intervall, void *parameter)
 
 int main( int argc, char *argv[] )
 {
+	struct resolution res;
+
+	if (argc > 1)
+	{
+		res.width = 1280;
+		res.height = 720;
+	}
+	else
+	{
+		res.width = 640;
+		res.height = 480;
+	}
+
 	// Load a font
 	TTF_Font *font;
 
@@ -75,7 +87,7 @@ int main( int argc, char *argv[] )
 
 	// Erstelle die Bildschirmfläche
 	SDL_Surface *screen = NULL;
-	screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF);
+	screen = SDL_SetVideoMode( res.width, res.height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF);
 
 	while (1)
 	{
@@ -83,7 +95,8 @@ int main( int argc, char *argv[] )
 		{
 			case 0:
 				printf("Starte Spiel\n");
-				start_game (screen, event);
+				if(start_game (screen, event, res))
+					printf("Verloren!\n");
 				break;
 			case 1:
 				printf("Zeige Highscores\n");

@@ -1,3 +1,7 @@
+struct resolution {unsigned short width; unsigned short height;};
+
+SDL_Surface *ScaleSurface(SDL_Surface *Surface, double scale);
+
 /**
  * Diese Funktion zeichnet eine Block aus einer Grafik welche alle möglichen Blöcke beinhaltet auf den Bildschirm
  *
@@ -8,7 +12,7 @@
  * @param shift		Verschiebung des Bildschirmes in x-Richtung
  * @param blocktype	Art des Blockes (daraus folgt die Position des Blockes in bitmap
  */
-void drawBlock(SDL_Surface *screen, SDL_Surface *bitmap, int x, int y, int shift, int blocktype);
+void drawBlock(SDL_Surface *screen, SDL_Surface *bitmap, int x, int y, int shift, int blocktype, unsigned short block_size);
 
 /**
  * Diese Funktion gibt den Typ eines Blockes aus
@@ -26,9 +30,9 @@ int getBlock(int *world, int worldSizeX, int worldSizeY, int y, int x);
 /**
  * Diese Funktion beinhaltet das eigentliche Spiel
  *
- * @param screen	Pointer auf die Surface auf welcher das Menü gezeigt werden soll
+ * @param screen	Pointer auf die Surface auf welcher das Menü gezeigt werden soll	
  * @param event	SDL-Event für Timer und Tastaturereignisse
  *
  * @return 
  */
-int start_game(SDL_Surface *screen, SDL_Event event);
+int start_game(SDL_Surface *screen, SDL_Event event, struct resolution res);
