@@ -1,4 +1,7 @@
-struct resolution {unsigned short width; unsigned short height;};
+#ifndef MAIN_H
+#include "main.h"
+#define MAIN_H
+#endif
 
 SDL_Surface *ScaleSurface(SDL_Surface *Surface, double scale);
 

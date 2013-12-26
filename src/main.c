@@ -10,10 +10,13 @@
 
 #include <SDL/SDL_ttf.h>
 
+#ifndef MAIN_H
+#include "main.h"
+#define MAIN_H
+#endif
+
 #include "menu.h"
 #include "game.h"
-
-#define SCREEN_BPP      		32
 
 #define FONT_SIZE 16
 
@@ -87,6 +90,8 @@ int main( int argc, char *argv[] )
 	SDL_Surface *screen = NULL;
 	screen = SDL_SetVideoMode( res.width, res.height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF);
 
+	SDL_ShowCursor(0);
+
 	while (1)
 	{
 		switch (draw_menu(screen, font, event))
@@ -101,6 +106,9 @@ int main( int argc, char *argv[] )
 				break;
 			case 2:
 				printf("Levelauswahl\n");
+				break;
+			case 3:
+				settingsMenu(screen, font, event, &res);
 				break;
 			default:
 				printf("Beende Spiel\n");
