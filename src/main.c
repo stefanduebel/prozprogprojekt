@@ -9,6 +9,7 @@
 #endif
 
 #include <SDL/SDL_ttf.h>
+#include <SDL/SDL_mixer.h>
 
 #ifndef MAIN_H
 #include "main.h"
@@ -75,7 +76,7 @@ int main( int argc, char *argv[] )
 	}
 	
 	// Initialisiere SDL
-	if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER ) < 0 ) {
+	if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO) < 0 ) {
 		fprintf( stderr, "SDL konnte nicht initialisiert werden:  %s\n", SDL_GetError() );
 		return 1;
 	}
@@ -91,6 +92,31 @@ int main( int argc, char *argv[] )
 	screen = SDL_SetVideoMode( res.width, res.height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF);
 
 	SDL_ShowCursor(0);
+
+	// Audio
+	int audio_rate = 22050;
+	Uint16 audio_format = AUDIO_S16SYS;
+	int audio_channels = 2;
+	int audio_buffers = 4096;
+ 
+	if(Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) != 0) {
+		fprintf(stderr, "Unable to initialize audio: %s\n", Mix_GetError());
+		exit(1);
+	}
+
+	Mix_Chunk *sound = NULL;
+ 
+	sound = Mix_LoadWAV("resources/jeopardy.wav");
+	if(sound == NULL) {
+		fprintf(stderr, "Unable to load WAV file: %s\n", Mix_GetError());
+	}
+
+	int channel;
+ 
+	channel = Mix_PlayChannel(-1, sound, -1);
+	if(channel == -1) {
+		fprintf(stderr, "Unable to play WAV file: %s\n", Mix_GetError());
+	}
 
 	while (1)
 	{

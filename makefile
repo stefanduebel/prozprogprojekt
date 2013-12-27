@@ -7,7 +7,7 @@ CC=gcc
 CFLAGS=-std=c99 -pedantic -Wall -Wextra
 
 # SDL
-SDL=`sdl-config --cflags --libs` -lSDL_ttf -lm
+SDL=`sdl-config --cflags --libs` -lSDL_ttf -lSDL_mixer -lm
 
 OBJDIR = bin/obj
 
