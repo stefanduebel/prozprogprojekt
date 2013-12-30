@@ -133,8 +133,8 @@ int main( int argc, char *argv[] )
 				break;
 			case 2:
 				levelNo = drawLevelMenu(screen, font, event);
-				printf("Level: %d\n", levelNo);
-				startGame(screen, event, res, levelNo);
+				if (levelNo != -1)
+					startGame(screen, event, res, levelNo);
 				break;
 			case 3:
 				drawSettingsMenu(screen, font, event, &res);
