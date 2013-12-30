@@ -226,7 +226,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				// Zeichne alle Blöcke ein
 				for(y = 0; y < res.height/blockSize; y++)
 				{
-					for(x = camPositionX/blockSize; x < camPositionX/blockSize+res.width/blockSize+1; x++)
+					for(x = camPositionX/blockSize; x < camPositionX/blockSize+res.width/blockSize+2; x++)
 					{
 						drawBlock(screen, blockset, x, y, camPositionX, getBlock(&world[0][0], worldSizeX, worldSizeY, y, x), blockSize);
 					}
