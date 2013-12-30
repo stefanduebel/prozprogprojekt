@@ -23,3 +23,16 @@
 	* Highscoreliste
 	* Levelauswahl
 * Grafiken und Musik/Sounds erstellen oder suchen
+
+## CodeStil
+
+* Klammern verwenden
+* Variablen und Funktionsnamen:
+	* grundsätzlich klein geschrieben
+	* wenn diese aus mehreren Wörtern bestehen: erster Buchstabe der Wörter groß (z. B. drawMenu)
+	* keine Worttrennung mit Unterstrichen
+* Abfragen
+	* zwischen den Variablen / Rechnungen und dem Vergleichsoperator ein Leerzeichen (z. B. (x*y) > (x+y))
+* defines
+	* alle Zeichen groß geschrieben
+	* wenn aus mehreren Wörtern bestehend Trennung per Unterstrich (z. B. SCREEN_BPP)

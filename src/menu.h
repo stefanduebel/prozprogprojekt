@@ -12,6 +12,6 @@
  *
  * @return ausgewähltes Item beim besätigen
  */
-int draw_menu(SDL_Surface *screen, TTF_Font *font, SDL_Event event);
+int drawMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event);
 
 void settingsMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct resolution *res);

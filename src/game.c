@@ -16,28 +16,28 @@
 
 #define FONT_SIZE 16
 
-#define SOURCE_BLOCK_SIZE		48
+#define SOURCE_blockSize		48
 #define BLOCK_SET_WIDTH 		10
 #define BLOCK_SET_HEIGHT		10
 #define BLOCK_SET_SIZE  		(BLOCK_SET_WIDTH * BLOCK_SET_HEIGHT)
 
-void drawBlock(SDL_Surface *screen, SDL_Surface *bitmap, int x, int y, int shift, int blocktype, unsigned short block_size)
+void drawBlock(SDL_Surface *screen, SDL_Surface *bitmap, int x, int y, int shift, int blocktype, unsigned short blockSize)
 {
 	if(blocktype >= 0 && blocktype <= BLOCK_SET_SIZE)
 	{
 		// Ausschnitt aus der Blöckebitmap welche einen Block beinhaltet
 		SDL_Rect source;
-		source.x = blocktype%BLOCK_SET_WIDTH*block_size;
-		source.y = blocktype/BLOCK_SET_HEIGHT*block_size;
-		source.w = block_size;
-		source.h = block_size;
+		source.x = blocktype%BLOCK_SET_WIDTH*blockSize;
+		source.y = blocktype/BLOCK_SET_HEIGHT*blockSize;
+		source.w = blockSize;
+		source.h = blockSize;
 
 		// Ausschnitt aus dem Bildschirminhalt wo der Block gezeichnet werden soll
 		SDL_Rect destination;
-		destination.x = x*block_size-shift;
-		destination.y = y*block_size;
-		destination.w = block_size;
-		destination.h = block_size;
+		destination.x = x*blockSize-shift;
+		destination.y = y*blockSize;
+		destination.w = blockSize;
+		destination.h = blockSize;
 
 		// Block auf den Screen zeichnen
 		SDL_BlitSurface(bitmap, &source, screen, &destination);
@@ -57,7 +57,7 @@ int getBlock(int *world, int worldSizeX, int worldSizeY, int y, int x)
 	}
 }
 
-int start_game(SDL_Surface *screen, SDL_Event event, struct resolution res, int level)
+int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int level)
 {
 	// Hintergrund
 	Uint32 color;
@@ -73,19 +73,16 @@ int start_game(SDL_Surface *screen, SDL_Event event, struct resolution res, int 
 	int worldSizeX;
 	int worldSizeY;
 
-	char worldFilename[35];
-	sprintf(worldFilename, "resources/maps/level%d.map", level);
-	printf("worldfile: %s\n", worldFilename);
-	if (worldFilename == NULL)
-		return -1;
-	FILE *world_file = fopen(worldFilename, "r");
-	if (world_file == NULL)
+	char filepath[50];
+	sprintf(filepath, "resources/maps/level%d.map", level);
+	FILE *worldFile = fopen(filepath, "r");
+	if (worldFile == NULL)
 		return -1;
 	char *line = NULL;
 	size_t len = 0;
 
 	// erste Zeile: Größe des Levels
-	getline(&line, &len, world_file);
+	getline(&line, &len, worldFile);
 	char *tok = strtok(line, ",");
 	sscanf(tok, "%d", &worldSizeY);
 	tok = strtok(NULL, ",");
@@ -98,7 +95,7 @@ int start_game(SDL_Surface *screen, SDL_Event event, struct resolution res, int 
 	// lese restliche Zeilen: das eigentliche Level
 	while (row < worldSizeY)
 	{
-		getline(&line, &len, world_file);
+		getline(&line, &len, worldFile);
 		printf("Zeile: %s\n", line);
 		
 		tok = strtok(line, ",");
@@ -119,11 +116,10 @@ int start_game(SDL_Surface *screen, SDL_Event event, struct resolution res, int 
 	int y;
 
 	// berechne Blockgröße
-	unsigned short block_size = res.height / worldSizeY;
+	unsigned short blockSize = res.height / worldSizeY;
 
 	// Lade Grafik für die Blöcke
-	char filepath[50];
-	sprintf(filepath, "resources/images/blocks_%d.bmp", block_size);
+	sprintf(filepath, "resources/images/blocks_%d.bmp", blockSize);
 	SDL_Surface *blockset = SDL_LoadBMP(filepath);
 
 
@@ -136,7 +132,7 @@ int start_game(SDL_Surface *screen, SDL_Event event, struct resolution res, int 
 	int goLeft = 0;
 	int goRight = 0;
 	double v = 0; // Vertikalgeschwindigkeit
-	double a = 0.6 * (48 / (double) block_size); // Gravitation
+	double a = 0.6 * (48 / (double) blockSize); // Gravitation
 
 
 	// Kamera
@@ -164,23 +160,23 @@ int start_game(SDL_Surface *screen, SDL_Event event, struct resolution res, int 
 				// Kontrollieren ob Welt verlassen wurde (in horizontaler Richtung)
 				if(playerPositionX < 0)
 				{playerPositionX = 0;}
-				else if(playerPositionX > (worldSizeX-1)*block_size)
-				{playerPositionX = (worldSizeX-1)*block_size;}
+				else if(playerPositionX > (worldSizeX-1)*blockSize)
+				{playerPositionX = (worldSizeX-1)*blockSize;}
 
 
 				// X-Collision
-				if(getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/block_size, playerPositionX/block_size) >= 0)
-				{playerPositionX = playerPositionX-playerPositionX%block_size+block_size;}
+				if(getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/blockSize, playerPositionX/blockSize) >= 0)
+				{playerPositionX = playerPositionX-playerPositionX%blockSize+blockSize;}
 				// verhindere das setzen auf einen Block wenn man gegen diesen springt
-				if(playerPositionY%block_size && getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/block_size+1, playerPositionX/block_size) >= 0)
-				{playerPositionX = playerPositionX-playerPositionX%block_size+block_size;}
+				if(playerPositionY%blockSize && getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/blockSize+1, playerPositionX/blockSize) >= 0)
+				{playerPositionX = playerPositionX-playerPositionX%blockSize+blockSize;}
 
 				// X-Kollision von der anderen Seite
-				if(getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/block_size, playerPositionX/block_size+1) >= 0)
-				{playerPositionX = playerPositionX-playerPositionX%block_size;}
+				if(getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/blockSize, playerPositionX/blockSize+1) >= 0)
+				{playerPositionX = playerPositionX-playerPositionX%blockSize;}
 				// verhindere das setzen auf einen Block wenn man gegen diesen springt
-				if(playerPositionY%block_size && getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/block_size+1, playerPositionX/block_size+1) >= 0)
-				{playerPositionX = playerPositionX-playerPositionX%block_size;}
+				if(playerPositionY%blockSize && getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/blockSize+1, playerPositionX/blockSize+1) >= 0)
+				{playerPositionX = playerPositionX-playerPositionX%blockSize;}
 
 
 				// Schwerkraft
@@ -189,26 +185,26 @@ int start_game(SDL_Surface *screen, SDL_Event event, struct resolution res, int 
 
 
 				// Y-Collision: nicht durch Blöcke hindurchfallen
-				if(getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/block_size+1, playerPositionX/block_size) >= 0)
-				{playerPositionY = playerPositionY-playerPositionY%block_size;  v = 0;}
-				if(playerPositionX%block_size && getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/block_size+1, playerPositionX/block_size+1) >= 0)
-				{playerPositionY = playerPositionY-playerPositionY%block_size; v = 0;}
+				if(getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/blockSize+1, playerPositionX/blockSize) >= 0)
+				{playerPositionY = playerPositionY-playerPositionY%blockSize;  v = 0;}
+				if(playerPositionX%blockSize && getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/blockSize+1, playerPositionX/blockSize+1) >= 0)
+				{playerPositionY = playerPositionY-playerPositionY%blockSize; v = 0;}
 
 
 				// in vertikaler Richtung aus der Welt: zum Start zurücksetzen
-				if(playerPositionY < 0-block_size || playerPositionY > worldSizeY*block_size)
+				if(playerPositionY < 0-blockSize || playerPositionY > worldSizeY*blockSize)
 				{
 					return 1;
 				}
 
 
 				// Kamera
-				camPositionX += ((playerPositionX - res.width / 2 + block_size / 2) - camPositionX) / 10;
+				camPositionX += ((playerPositionX - res.width / 2 + blockSize / 2) - camPositionX) / 10;
 
 				if(camPositionX < 0)
 				{camPositionX = 0;}
-				else if(camPositionX > worldSizeX*block_size-res.width)
-				{camPositionX = worldSizeX*block_size-res.width;}
+				else if(camPositionX > worldSizeX*blockSize-res.width)
+				{camPositionX = worldSizeX*blockSize-res.width;}
 
 
 				// Lösche den Hintergrund
@@ -217,40 +213,40 @@ int start_game(SDL_Surface *screen, SDL_Event event, struct resolution res, int 
 
 				// Zeichne das Hintergrundbild
 				// sichtbarer Ausschnitt des Bildes
-				SDL_Rect background_source;
-				background_source.x = (int) ( (((double)camPositionX/(worldSizeX*block_size-res.width))) * (background->clip_rect.w-res.width) );
-				background_source.y = 0;
-				background_source.w = res.width;
-				background_source.h = res.height;
+				SDL_Rect backgroundSource;
+				backgroundSource.x = (int) ( (((double)camPositionX/(worldSizeX*blockSize-res.width))) * (background->clip_rect.w-res.width) );
+				backgroundSource.y = 0;
+				backgroundSource.w = res.width;
+				backgroundSource.h = res.height;
 
 				// zeichne den Ausschnitt auf den gesamten Screen
-				SDL_BlitSurface(background, &background_source, screen, NULL);
+				SDL_BlitSurface(background, &backgroundSource, screen, NULL);
 
 
 				// Zeichne alle Blöcke ein
-				for(y = 0; y < res.height/block_size; y++)
+				for(y = 0; y < res.height/blockSize; y++)
 				{
-					for(x = camPositionX/block_size; x < camPositionX/block_size+res.width/block_size+1; x++)
+					for(x = camPositionX/blockSize; x < camPositionX/blockSize+res.width/blockSize+1; x++)
 					{
-						drawBlock(screen, blockset, x, y, camPositionX, getBlock(&world[0][0], worldSizeX, worldSizeY, y, x), block_size);
+						drawBlock(screen, blockset, x, y, camPositionX, getBlock(&world[0][0], worldSizeX, worldSizeY, y, x), blockSize);
 					}
 				}
 
 
 				// Zeichne den Spieler
-				SDL_Rect player_source;
-				player_source.x = 0;
-				player_source.y = 0;
-				player_source.w = block_size;
-				player_source.h = block_size;
+				SDL_Rect playerSource;
+				playerSource.x = 0;
+				playerSource.y = 0;
+				playerSource.w = blockSize;
+				playerSource.h = blockSize;
 
-				SDL_Rect player_destination;
-				player_destination.x = playerPositionX-camPositionX;
-				player_destination.y = playerPositionY;
-				player_destination.w = block_size;
-				player_destination.h = block_size;
+				SDL_Rect playerDestination;
+				playerDestination.x = playerPositionX-camPositionX;
+				playerDestination.y = playerPositionY;
+				playerDestination.w = blockSize;
+				playerDestination.h = blockSize;
 
-				SDL_BlitSurface(player, &player_source, screen, &player_destination);
+				SDL_BlitSurface(player, &playerSource, screen, &playerDestination);
 
 
 				// Zeichne das berechnete Bild

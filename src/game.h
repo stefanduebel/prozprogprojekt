@@ -3,8 +3,6 @@
 #define MAIN_H
 #endif
 
-SDL_Surface *ScaleSurface(SDL_Surface *Surface, double scale);
-
 /**
  * Diese Funktion zeichnet eine Block aus einer Grafik welche alle möglichen Blöcke beinhaltet auf den Bildschirm
  *
@@ -39,4 +37,4 @@ int getBlock(int *world, int worldSizeX, int worldSizeY, int y, int x);
  *
  * @return 
  */
-int start_game(SDL_Surface *screen, SDL_Event event, struct resolution res, int level);
+int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int level);

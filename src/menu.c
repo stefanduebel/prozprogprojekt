@@ -15,7 +15,7 @@
 
 #define RESOLUTION_NUM 2
 
-int draw_menu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
+int drawMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 {
 	// Färbe den Hintergrund schwarz
 	SDL_FillRect(screen, &screen->clip_rect, SDL_MapRGB(screen->format, 0, 0, 0));
@@ -29,40 +29,40 @@ int draw_menu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 		char *name;
 		SDL_Surface *surface;
 		SDL_Rect position;
-	} menu_item[MENU_ITEMS];
+	} menuItem[MENU_ITEMS];
 
 	// ausgewählter Menü-Eintrag
-	short selected_item = 0;
+	short selectedItem = 0;
 
 	// initialisiere Namen der Einträge
-	menu_item[0].name = "Starte Spiel"; 
-	menu_item[1].name = "Highscores";
-	menu_item[2].name = "Level Auswahl";
-	menu_item[3].name = "Einstellungen";
-	menu_item[4].name = "Spiel beenden";
+	menuItem[0].name = "Starte Spiel"; 
+	menuItem[1].name = "Highscores";
+	menuItem[2].name = "Level Auswahl";
+	menuItem[3].name = "Einstellungen";
+	menuItem[4].name = "Spiel beenden";
 
 	// Gesamthöhe des Menüs, zunächst nur die Zwischenräume
-	unsigned int menu_height = (MENU_ITEMS - 1) * MENU_PADDING;
+	unsigned int menuHeight = (MENU_ITEMS - 1) * MENU_PADDING;
 
 	// rendere die einzelnen Menüeinträge in ihre jeweiligen Surfaces und bestimme die Gesamthöhe des Menüs
 	for (int i = 0; i < MENU_ITEMS; i++)
 	{
-		menu_item[i].surface = TTF_RenderText_Solid(font, menu_item[i].name, color[(i == selected_item)]);
-		menu_height += menu_item[i].surface->clip_rect.h;
+		menuItem[i].surface = TTF_RenderText_Solid(font, menuItem[i].name, color[(i == selectedItem)]);
+		menuHeight += menuItem[i].surface->clip_rect.h;
 	}
 
 	// bereits ausgegebene Menühöhe
-	unsigned int printed_height = 0;
+	unsigned int printedHeight = 0;
 
 	// bestimme die x und y Koordinaten der einzelnen Einträge, zeige diese dann auf dem screen an
 	for (int i = 0; i < MENU_ITEMS; i++)
 	{
 		// position der einzelnen Menü-Einträge bestimmen
-		menu_item[i].position.x = (screen->clip_rect.w / 2) - (menu_item[i].surface->clip_rect.w / 2);
-		menu_item[i].position.y = (screen->clip_rect.h / 2) - (menu_height / 2) + i * MENU_PADDING + printed_height;
-		printed_height += menu_item[i].surface->clip_rect.h;
+		menuItem[i].position.x = (screen->clip_rect.w / 2) - (menuItem[i].surface->clip_rect.w / 2);
+		menuItem[i].position.y = (screen->clip_rect.h / 2) - (menuHeight / 2) + i * MENU_PADDING + printedHeight;
+		printedHeight += menuItem[i].surface->clip_rect.h;
 
-		SDL_BlitSurface(menu_item[i].surface, NULL, screen, &(menu_item[i].position));
+		SDL_BlitSurface(menuItem[i].surface, NULL, screen, &(menuItem[i].position));
 	}
 
 
@@ -84,37 +84,37 @@ int draw_menu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 				{
 					// Pfeil hoch
 					case SDLK_UP:
-						selected_item--;
+						selectedItem--;
 						// wenn oberster Eintrag gehe zum untersten
-						if (selected_item < 0)
-							selected_item = MENU_ITEMS - 1;
+						if (selectedItem < 0)
+							selectedItem = MENU_ITEMS - 1;
 
 						// zeichne alle Einträge neu
 						for (int i = 0; i < MENU_ITEMS; i++)
 						{
-							menu_item[i].surface = TTF_RenderText_Solid(font, menu_item[i].name, color[(i == selected_item)]);
-							SDL_BlitSurface(menu_item[i].surface, NULL, screen, &(menu_item[i].position));
+							menuItem[i].surface = TTF_RenderText_Solid(font, menuItem[i].name, color[(i == selectedItem)]);
+							SDL_BlitSurface(menuItem[i].surface, NULL, screen, &(menuItem[i].position));
 						}
 						break;
 
 					// Pfeil runter
 					case SDLK_DOWN:
-						selected_item++;
+						selectedItem++;
 						// wenn unterster Eintrag gehe zum obersten
-						selected_item %= MENU_ITEMS;
+						selectedItem %= MENU_ITEMS;
 
 						// zeichne alle Einträge neu
 						for (int i = 0; i < MENU_ITEMS; i++)
 						{
-							menu_item[i].surface = TTF_RenderText_Solid(font, menu_item[i].name, color[(i == selected_item)]);
-							SDL_BlitSurface(menu_item[i].surface, NULL, screen, &(menu_item[i].position));
+							menuItem[i].surface = TTF_RenderText_Solid(font, menuItem[i].name, color[(i == selectedItem)]);
+							SDL_BlitSurface(menuItem[i].surface, NULL, screen, &(menuItem[i].position));
 						}
 						break;
 
 					// Bestätigen-Taste
 					case SDLK_RETURN:
 						// gebe ausgewählten Eintrag zurück
-						return selected_item;
+						return selectedItem;
 
 					default:
 						break;
@@ -142,39 +142,39 @@ void settingsMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct r
 		char *name;
 		SDL_Surface *surface;
 		SDL_Rect position;
-	} menu_item[RESOLUTION_NUM + 2];
+	} menuItem[RESOLUTION_NUM + 2];
 
 	// ausgewählter Menü-Eintrag
-	short selected_item = 0;
+	short selectedItem = 0;
 
 	// initialisiere Namen der Einträge
-	menu_item[0].name = "1280 x 720"; 
-	menu_item[1].name = "640 x 480";
-	menu_item[2].name = "Fullscreen";
-	menu_item[3].name = "zurueck";
+	menuItem[0].name = "1280 x 720"; 
+	menuItem[1].name = "640 x 480";
+	menuItem[2].name = "Fullscreen";
+	menuItem[3].name = "zurueck";
 
 	// Gesamthöhe des Menüs, zunächst nur die Zwischenräume
-	unsigned int menu_height = (RESOLUTION_NUM + 2) * MENU_PADDING;
+	unsigned int menuHeight = (RESOLUTION_NUM + 2) * MENU_PADDING;
 
 	// rendere die einzelnen Menüeinträge in ihre jeweiligen Surfaces und bestimme die Gesamthöhe des Menüs
 	for (int i = 0; i < RESOLUTION_NUM + 2; i++)
 	{
-		menu_item[i].surface = TTF_RenderText_Solid(font, menu_item[i].name, color[(i == selected_item)]);
-		menu_height += menu_item[i].surface->clip_rect.h;
+		menuItem[i].surface = TTF_RenderText_Solid(font, menuItem[i].name, color[(i == selectedItem)]);
+		menuHeight += menuItem[i].surface->clip_rect.h;
 	}
 
 	// bereits ausgegebene Menühöhe
-	unsigned int printed_height = 0;
+	unsigned int printedHeight = 0;
 
 	// bestimme die x und y Koordinaten der einzelnen Einträge, zeige diese dann auf dem screen an
 	for (int i = 0; i < RESOLUTION_NUM + 2; i++)
 	{
 		// position der einzelnen Menü-Einträge bestimmen
-		menu_item[i].position.x = (screen->clip_rect.w / 2) - (menu_item[i].surface->clip_rect.w / 2);
-		menu_item[i].position.y = (screen->clip_rect.h / 2) - (menu_height / 2) + i * MENU_PADDING + printed_height;
-		printed_height += menu_item[i].surface->clip_rect.h;
+		menuItem[i].position.x = (screen->clip_rect.w / 2) - (menuItem[i].surface->clip_rect.w / 2);
+		menuItem[i].position.y = (screen->clip_rect.h / 2) - (menuHeight / 2) + i * MENU_PADDING + printedHeight;
+		printedHeight += menuItem[i].surface->clip_rect.h;
 
-		SDL_BlitSurface(menu_item[i].surface, NULL, screen, &(menu_item[i].position));
+		SDL_BlitSurface(menuItem[i].surface, NULL, screen, &(menuItem[i].position));
 	}
 
 
@@ -196,36 +196,36 @@ void settingsMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct r
 				{
 					// Pfeil hoch
 					case SDLK_UP:
-						selected_item--;
+						selectedItem--;
 						// wenn oberster Eintrag gehe zum untersten
-						if (selected_item < 0)
-							selected_item = RESOLUTION_NUM + 2 - 1;
+						if (selectedItem < 0)
+							selectedItem = RESOLUTION_NUM + 2 - 1;
 
 						// zeichne alle Einträge neu
 						for (int i = 0; i < RESOLUTION_NUM + 2; i++)
 						{
-							menu_item[i].surface = TTF_RenderText_Solid(font, menu_item[i].name, color[(i == selected_item)]);
-							SDL_BlitSurface(menu_item[i].surface, NULL, screen, &(menu_item[i].position));
+							menuItem[i].surface = TTF_RenderText_Solid(font, menuItem[i].name, color[(i == selectedItem)]);
+							SDL_BlitSurface(menuItem[i].surface, NULL, screen, &(menuItem[i].position));
 						}
 						break;
 
 					// Pfeil runter
 					case SDLK_DOWN:
-						selected_item++;
+						selectedItem++;
 						// wenn unterster Eintrag gehe zum obersten
-						selected_item %= RESOLUTION_NUM + 2;
+						selectedItem %= RESOLUTION_NUM + 2;
 
 						// zeichne alle Einträge neu
 						for (int i = 0; i < RESOLUTION_NUM + 2; i++)
 						{
-							menu_item[i].surface = TTF_RenderText_Solid(font, menu_item[i].name, color[(i == selected_item)]);
-							SDL_BlitSurface(menu_item[i].surface, NULL, screen, &(menu_item[i].position));
+							menuItem[i].surface = TTF_RenderText_Solid(font, menuItem[i].name, color[(i == selectedItem)]);
+							SDL_BlitSurface(menuItem[i].surface, NULL, screen, &(menuItem[i].position));
 						}
 						break;
 
 					// Bestätigen-Taste
 					case SDLK_RETURN:
-						if (selected_item == 0)
+						if (selectedItem == 0)
 						{
 							res->width = 1280;
 							res->height = 720;
@@ -234,7 +234,7 @@ void settingsMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct r
 							else
 								screen = SDL_SetVideoMode( res->width, res->height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF);
 						}
-						if (selected_item == 1)
+						if (selectedItem == 1)
 						{
 							res->width = 640;
 							res->height = 480;
@@ -244,28 +244,28 @@ void settingsMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct r
 								screen = SDL_SetVideoMode( res->width, res->height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF);
 							
 						}
-						if (selected_item == 2)
+						if (selectedItem == 2)
 						{
 							if (!(screen->flags & (SDL_FULLSCREEN)))
 								screen = SDL_SetVideoMode( res->width, res->height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
 							else
 								screen = SDL_SetVideoMode( res->width, res->height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF);
 						}
-						if (selected_item == 3)
+						if (selectedItem == 3)
 							return;
 
 						// bereits ausgegebene Menühöhe
-						printed_height = 0;
+						printedHeight = 0;
 
 						// bestimme die x und y Koordinaten der einzelnen Einträge, zeige diese dann auf dem screen an
 						for (int i = 0; i < RESOLUTION_NUM + 2; i++)
 						{
 							// position der einzelnen Menü-Einträge bestimmen
-							menu_item[i].position.x = (screen->clip_rect.w / 2) - (menu_item[i].surface->clip_rect.w / 2);
-							menu_item[i].position.y = (screen->clip_rect.h / 2) - (menu_height / 2) + i * MENU_PADDING + printed_height;
-							printed_height += menu_item[i].surface->clip_rect.h;
+							menuItem[i].position.x = (screen->clip_rect.w / 2) - (menuItem[i].surface->clip_rect.w / 2);
+							menuItem[i].position.y = (screen->clip_rect.h / 2) - (menuHeight / 2) + i * MENU_PADDING + printedHeight;
+							printedHeight += menuItem[i].surface->clip_rect.h;
 
-							SDL_BlitSurface(menu_item[i].surface, NULL, screen, &(menu_item[i].position));
+							SDL_BlitSurface(menuItem[i].surface, NULL, screen, &(menuItem[i].position));
 						}
 
 					default:

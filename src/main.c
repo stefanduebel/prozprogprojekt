@@ -94,12 +94,12 @@ int main( int argc, char *argv[] )
 	SDL_ShowCursor(0);
 
 	// Audio
-	int audio_rate = 22050;
-	Uint16 audio_format = AUDIO_S16SYS;
-	int audio_channels = 2;
-	int audio_buffers = 4096;
+	int audioRate = 22050;
+	Uint16 audioFormat = AUDIO_S16SYS;
+	int audioChannels = 2;
+	int audioBuffers = 4096;
  
-	if(Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) != 0) {
+	if(Mix_OpenAudio(audioRate, audioFormat, audioChannels, audioBuffers) != 0) {
 		fprintf(stderr, "Unable to initialize audio: %s\n", Mix_GetError());
 		exit(1);
 	}
@@ -120,11 +120,11 @@ int main( int argc, char *argv[] )
 
 	while (1)
 	{
-		switch (draw_menu(screen, font, event))
+		switch (drawMenu(screen, font, event))
 		{
 			case 0:
 				printf("Starte Spiel\n");
-				if(start_game (screen, event, res, 0))
+				if(startGame (screen, event, res, 0))
 					printf("Verloren!\n");
 				break;
 			case 1:
