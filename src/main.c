@@ -120,6 +120,7 @@ int main( int argc, char *argv[] )
 
 	while (1)
 	{
+		int levelNo;
 		switch (drawMenu(screen, font, event))
 		{
 			case 0:
@@ -131,10 +132,12 @@ int main( int argc, char *argv[] )
 				printf("Zeige Highscores\n");
 				break;
 			case 2:
-				printf("Levelauswahl\n");
+				levelNo = drawLevelMenu(screen, font, event);
+				printf("Level: %d\n", levelNo);
+				startGame(screen, event, res, levelNo);
 				break;
 			case 3:
-				settingsMenu(screen, font, event, &res);
+				drawSettingsMenu(screen, font, event, &res);
 				break;
 			default:
 				printf("Beende Spiel\n");

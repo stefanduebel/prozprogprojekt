@@ -127,7 +127,7 @@ int drawMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 	return -1;
 }
 
-void settingsMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct resolution *res)
+void drawSettingsMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct resolution *res)
 {
 	printf("zeichne Einstellungsmenü\n");
 	// Färbe den Hintergrund schwarz
@@ -275,4 +275,130 @@ void settingsMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct r
 			}
 		}
 	}
+}
+
+int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
+{
+	// Färbe den Hintergrund schwarz
+	SDL_FillRect(screen, &screen->clip_rect, SDL_MapRGB(screen->format, 0, 0, 0));
+
+	// Farben für die Schrift der Menüeinträge (standard und ausgewählt)
+	SDL_Color color[2] = {{255,255,255,0},{0,255,0,0}};
+
+	int items = 0;
+	char filepath[50];
+	FILE *levelFile;
+
+	// bestimme Anzahl der Level
+	while (1)
+	{
+		sprintf(filepath, "resources/maps/level%d.map", items);
+		levelFile = fopen(filepath, "r");
+		if (levelFile == NULL)
+		{
+			break;
+		}
+		items++;
+	}
+
+
+	// Struktur für einen einzelnen Menüeintrag (Name (bisher nicht genutzt), Render-Fläche, Position)
+	struct menu
+	{
+		char name[4];
+		SDL_Surface *surface;
+		SDL_Rect position;
+	} menuItem[items];
+
+	// ausgewählter Menü-Eintrag
+	short selectedItem = 0;
+
+	// Gesamthöhe des Menüs, zunächst nur die Zwischenräume
+	unsigned int menuHeight = (items - 1) * MENU_PADDING;
+
+	// rendere die einzelnen Menüeinträge in ihre jeweiligen Surfaces und bestimme die Gesamthöhe des Menüs
+	for (int i = 0; i < items; i++)
+	{
+		printf("bei Item %d", i);
+		sprintf(menuItem[i].name, "%d", i+1);
+		menuItem[i].surface = TTF_RenderText_Solid(font, menuItem[i].name, color[(i == selectedItem)]);
+		menuHeight += menuItem[i].surface->clip_rect.h;
+	}
+
+	printf("Schleife durchlaufen\n");
+
+	// bereits ausgegebene Menühöhe
+	unsigned int printedHeight = 0;
+
+	// bestimme die x und y Koordinaten der einzelnen Einträge, zeige diese dann auf dem screen an
+	for (int i = 0; i < items; i++)
+	{
+		// position der einzelnen Menü-Einträge bestimmen
+		menuItem[i].position.x = (screen->clip_rect.w / 2) - (menuItem[i].surface->clip_rect.w / 2);
+		menuItem[i].position.y = (screen->clip_rect.h / 2) - (menuHeight / 2) + i * MENU_PADDING + printedHeight;
+		printedHeight += menuItem[i].surface->clip_rect.h;
+
+		SDL_BlitSurface(menuItem[i].surface, NULL, screen, &(menuItem[i].position));
+	}
+
+
+	// warte auf Events
+	while(SDL_WaitEvent (&event))
+	{
+		switch(event.type)
+		{
+			// behandle Timer-Event
+			case SDL_USEREVENT:
+				// rendere den Bildschirm neu (Hintergrundanimation wäre möglich)
+				SDL_Flip(screen);
+				break;
+
+			// behandle Tastendruck
+			case SDL_KEYDOWN:
+			{
+				switch(event.key.keysym.sym)
+				{
+					// Pfeil hoch
+					case SDLK_UP:
+						selectedItem--;
+						// wenn oberster Eintrag gehe zum untersten
+						if (selectedItem < 0)
+							selectedItem = items - 1;
+
+						// zeichne alle Einträge neu
+						for (int i = 0; i < items; i++)
+						{
+							menuItem[i].surface = TTF_RenderText_Solid(font, menuItem[i].name, color[(i == selectedItem)]);
+							SDL_BlitSurface(menuItem[i].surface, NULL, screen, &(menuItem[i].position));
+						}
+						break;
+
+					// Pfeil runter
+					case SDLK_DOWN:
+						selectedItem++;
+						// wenn unterster Eintrag gehe zum obersten
+						selectedItem %= items;
+
+						// zeichne alle Einträge neu
+						for (int i = 0; i < items; i++)
+						{
+							menuItem[i].surface = TTF_RenderText_Solid(font, menuItem[i].name, color[(i == selectedItem)]);
+							SDL_BlitSurface(menuItem[i].surface, NULL, screen, &(menuItem[i].position));
+						}
+						break;
+
+					// Bestätigen-Taste
+					case SDLK_RETURN:
+						// gebe ausgewählten Eintrag zurück
+						return selectedItem;
+
+					default:
+						break;
+				}
+				break;
+			}
+		}
+	}
+
+	return -1;
 }
