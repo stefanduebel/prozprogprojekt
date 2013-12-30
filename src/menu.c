@@ -310,7 +310,7 @@ int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 	} menuItem[items];
 
 	// ausgewählter Menü-Eintrag
-	short selectedItem = 0;
+	unsigned short selectedItem = 0;
 
 	SDL_Surface *itemBackgroundUnselected = SDL_LoadBMP(MENU_BACKGROUND);
 	SDL_Surface *itemBackgroundSelected = SDL_LoadBMP(MENU_BACKGROUND_SELECTED);
@@ -367,10 +367,14 @@ int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 				{
 					// Pfeil hoch
 					case SDLK_UP:
-						selectedItem -= itemsPerRow;
+						
 						// wenn oberster Eintrag gehe zum untersten
-						if (selectedItem < 0)
-							selectedItem += items - 1;
+						if (selectedItem < itemsPerRow)
+							selectedItem += (items - (items%itemsPerRow));
+						else
+							selectedItem -= itemsPerRow;
+						if (selectedItem >= items)
+							selectedItem -= itemsPerRow;
 
 						// zeichne alle Einträge neu
 						for (int i = 0; i < items; i++)
@@ -393,7 +397,7 @@ int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 					case SDLK_DOWN:
 						selectedItem += itemsPerRow;
 						// wenn unterster Eintrag gehe zum obersten
-						if (selectedItem > items)
+						if (selectedItem >= items)
 							selectedItem %= itemsPerRow;
 
 						// zeichne alle Einträge neu
@@ -415,11 +419,12 @@ int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 
 					// Pfeil rechts
 					case SDLK_RIGHT:
+						
 						// wenn unterster Eintrag gehe zum obersten
-						if ((selectedItem % itemsPerRow == itemsPerRow-1))
-							selectedItem -= itemsPerRow;
-
-						selectedItem++;
+						if ((selectedItem % itemsPerRow == itemsPerRow-1) || (selectedItem > items - 2))
+							selectedItem = (selectedItem / itemsPerRow) * itemsPerRow;
+						else
+							selectedItem++;
 
 						// zeichne alle Einträge neu
 						for (int i = 0; i < items; i++)
@@ -443,6 +448,9 @@ int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 						// wenn unterster Eintrag gehe zum obersten
 						if ((selectedItem % itemsPerRow == 0))
 							selectedItem += itemsPerRow;
+
+						if (selectedItem > items)
+							selectedItem = items;
 
 						selectedItem--;
 
