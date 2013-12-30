@@ -124,7 +124,7 @@ int main( int argc, char *argv[] )
 		{
 			case 0:
 				printf("Starte Spiel\n");
-				if(start_game (screen, event, res))
+				if(start_game (screen, event, res, 0))
 					printf("Verloren!\n");
 				break;
 			case 1:

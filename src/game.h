@@ -35,7 +35,8 @@ int getBlock(int *world, int worldSizeX, int worldSizeY, int y, int x);
  *
  * @param screen	Pointer auf die Surface auf welcher das Menü gezeigt werden soll	
  * @param event	SDL-Event für Timer und Tastaturereignisse
+ * @param level	Nummer des zu ladenden Levels
  *
  * @return 
  */
-int start_game(SDL_Surface *screen, SDL_Event event, struct resolution res);
+int start_game(SDL_Surface *screen, SDL_Event event, struct resolution res, int level);

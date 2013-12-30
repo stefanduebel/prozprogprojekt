@@ -57,7 +57,7 @@ int getBlock(int *world, int worldSizeX, int worldSizeY, int y, int x)
 	}
 }
 
-int start_game(SDL_Surface *screen, SDL_Event event, struct resolution res)
+int start_game(SDL_Surface *screen, SDL_Event event, struct resolution res, int level)
 {
 	// Hintergrund
 	Uint32 color;
@@ -73,7 +73,12 @@ int start_game(SDL_Surface *screen, SDL_Event event, struct resolution res)
 	int worldSizeX;
 	int worldSizeY;
 
-	FILE *world_file = fopen("resources/maps/test.map", "r");
+	char worldFilename[35];
+	sprintf(worldFilename, "resources/maps/level%d.map", level);
+	printf("worldfile: %s\n", worldFilename);
+	if (worldFilename == NULL)
+		return -1;
+	FILE *world_file = fopen(worldFilename, "r");
 	if (world_file == NULL)
 		return -1;
 	char *line = NULL;
