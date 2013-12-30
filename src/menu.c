@@ -283,7 +283,7 @@ int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 	SDL_FillRect(screen, &screen->clip_rect, SDL_MapRGB(screen->format, 0, 0, 0));
 
 	// Farben für die Schrift der Menüeinträge (standard und ausgewählt)
-	SDL_Color color[2] = {{255,255,255,0},{0,255,0,0}};
+	SDL_Color color[2] = {{0,0,0,0},{0,0,0,0}};
 
 	int items = 0;
 	char filepath[50];
@@ -301,8 +301,7 @@ int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 		items++;
 	}
 
-
-	// Struktur für einen einzelnen Menüeintrag (Name (bisher nicht genutzt), Render-Fläche, Position)
+	// Struktur für einen einzelnen Menüeintrag (Name (bisher nicht genutzt), Render-Fläche, Position, (zusätzlich könnte noch eine Beschreibung hinzugefügt werden))
 	struct menu
 	{
 		char name[4];
@@ -315,17 +314,20 @@ int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 
 	// Gesamthöhe des Menüs, zunächst nur die Zwischenräume
 	unsigned int menuHeight = (items - 1) * MENU_PADDING;
+	//~unsigned int menuWidth = ()
 
 	// rendere die einzelnen Menüeinträge in ihre jeweiligen Surfaces und bestimme die Gesamthöhe des Menüs
 	for (int i = 0; i < items; i++)
 	{
-		printf("bei Item %d", i);
 		sprintf(menuItem[i].name, "%d", i+1);
-		menuItem[i].surface = TTF_RenderText_Solid(font, menuItem[i].name, color[(i == selectedItem)]);
+		if (i == selectedItem)
+			menuItem[i].surface = SDL_LoadBMP(MENU_BACKGROUND_SELECTED);
+		else
+			menuItem[i].surface = SDL_LoadBMP(MENU_BACKGROUND);
+		SDL_Surface *textSurface = TTF_RenderText_Solid(font, menuItem[i].name, color[(i == selectedItem)]);
+		SDL_BlitSurface(textSurface, NULL, menuItem[i].surface, NULL);
 		menuHeight += menuItem[i].surface->clip_rect.h;
 	}
-
-	printf("Schleife durchlaufen\n");
 
 	// bereits ausgegebene Menühöhe
 	unsigned int printedHeight = 0;
@@ -368,7 +370,13 @@ int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 						// zeichne alle Einträge neu
 						for (int i = 0; i < items; i++)
 						{
-							menuItem[i].surface = TTF_RenderText_Solid(font, menuItem[i].name, color[(i == selectedItem)]);
+							if (i == selectedItem)
+								menuItem[i].surface = SDL_LoadBMP(MENU_BACKGROUND_SELECTED);
+							else
+								menuItem[i].surface = SDL_LoadBMP(MENU_BACKGROUND);
+							SDL_Surface *textSurface = TTF_RenderText_Solid(font, menuItem[i].name, color[(i == selectedItem)]);
+							// TODO: Textfläche zentrieren,
+							SDL_BlitSurface(textSurface, NULL, menuItem[i].surface, NULL);
 							SDL_BlitSurface(menuItem[i].surface, NULL, screen, &(menuItem[i].position));
 						}
 						break;
@@ -382,7 +390,12 @@ int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 						// zeichne alle Einträge neu
 						for (int i = 0; i < items; i++)
 						{
-							menuItem[i].surface = TTF_RenderText_Solid(font, menuItem[i].name, color[(i == selectedItem)]);
+							if (i == selectedItem)
+								menuItem[i].surface = SDL_LoadBMP(MENU_BACKGROUND_SELECTED);
+							else
+								menuItem[i].surface = SDL_LoadBMP(MENU_BACKGROUND);
+							SDL_Surface *textSurface = TTF_RenderText_Solid(font, menuItem[i].name, color[(i == selectedItem)]);
+							SDL_BlitSurface(textSurface, NULL, menuItem[i].surface, NULL);
 							SDL_BlitSurface(menuItem[i].surface, NULL, screen, &(menuItem[i].position));
 						}
 						break;

@@ -3,6 +3,8 @@
 #define MAIN_H
 #endif
 
+#define MENU_BACKGROUND "resources/images/menuBackground.bmp"
+#define MENU_BACKGROUND_SELECTED "resources/images/menuBackgroundSelected.bmp"
 /**
  *	Diese Funktion zeigt ein Menü an
  *
