@@ -71,6 +71,13 @@ int drawMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 	{
 		switch(event.type)
 		{
+			// Quit-Event
+			case SDL_QUIT:
+			{
+				return -1;
+				break;
+			}
+
 			// behandle Timer-Event
 			case SDL_USEREVENT:
 				// rendere den Bildschirm neu (Hintergrundanimation wäre möglich)
@@ -115,6 +122,7 @@ int drawMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 					case SDLK_RETURN:
 						// gebe ausgewählten Eintrag zurück
 						return selectedItem;
+						break;
 
 					default:
 						break;
@@ -183,6 +191,13 @@ void drawSettingsMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, stru
 	{
 		switch(event.type)
 		{
+			// Quit-Event
+			case SDL_QUIT:
+			{
+				return -1;
+				break;
+			}
+
 			// behandle Timer-Event
 			case SDL_USEREVENT:
 				// rendere den Bildschirm neu (Hintergrundanimation wäre möglich)
@@ -267,6 +282,12 @@ void drawSettingsMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, stru
 
 							SDL_BlitSurface(menuItem[i].surface, NULL, screen, &(menuItem[i].position));
 						}
+						break;
+
+					// Escape-Taste
+					case SDLK_ESCAPE:
+						return -1;
+						break;
 
 					default:
 						break;
@@ -354,6 +375,13 @@ int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 	{
 		switch(event.type)
 		{
+			// Quit-Event
+			case SDL_QUIT:
+			{
+				return -1;
+				break;
+			}
+
 			// behandle Timer-Event
 			case SDL_USEREVENT:
 				// rendere den Bildschirm neu (Hintergrundanimation wäre möglich)
@@ -474,11 +502,13 @@ int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 					// Escape-Taste
 					case SDLK_ESCAPE:
 						return -1;
+						break;
 
 					// Bestätigen-Taste
 					case SDLK_RETURN:
 						// gebe ausgewählten Eintrag zurück
 						return selectedItem;
+						break;
 
 					default:
 						break;
