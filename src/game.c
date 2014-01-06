@@ -7,8 +7,8 @@
 #   include "SDL.h"
 #endif
 
-
 #include <SDL/SDL_ttf.h>
+#include "SDL/SDL_image.h"
 
 #include "game.h"
 
@@ -59,6 +59,8 @@ int getBlock(int *world, int worldSizeX, int worldSizeY, int y, int x)
 
 int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int level)
 {
+	IMG_Init(IMG_INIT_PNG);
+
 	// Hintergrund
 	Uint32 color;
 	color = SDL_MapRGB( screen->format, 0, 0, 0 );
@@ -119,8 +121,8 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	unsigned short blockSize = res.height / worldSizeY;
 
 	// Lade Grafik für die Blöcke
-	sprintf(filepath, "resources/images/blocks_%d.bmp", blockSize);
-	SDL_Surface *blockset = SDL_LoadBMP(filepath);
+	sprintf(filepath, "resources/images/blocks_%d.png", blockSize);
+	SDL_Surface *blockset = IMG_Load(filepath);
 
 
 	// lade Grafik für den Spieler
