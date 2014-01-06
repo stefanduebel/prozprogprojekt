@@ -132,7 +132,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	int goLeft = 0;
 	int goRight = 0;
 	double v = 0; // Vertikalgeschwindigkeit
-	double a = 0.6 * (48 / (double) blockSize); // Gravitation
+	double a = 0.6 * ((double) blockSize / 48); // Gravitation
 
 
 	// Kamera
@@ -155,7 +155,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 			case SDL_USEREVENT:
 			{
 				// Spielerbewegung
-				playerPositionX = playerPositionX + (goRight - goLeft) * 9;
+				playerPositionX = playerPositionX + (goRight - goLeft) * 9 * ((double) blockSize / 48);
 
 				// Kontrollieren ob Welt verlassen wurde (in horizontaler Richtung)
 				if(playerPositionX < 0)
@@ -269,7 +269,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 					// Leertaster
 					case SDLK_SPACE:
 						if(v == 0)
-							{v = -9;}
+							{v = -9 * ((double) blockSize / 48);}
 						break;
 					// Pfeil hoch
 					case SDLK_UP:
