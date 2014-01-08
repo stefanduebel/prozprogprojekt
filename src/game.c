@@ -83,7 +83,10 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	char *line = NULL;
 	size_t len = 0;
 
-	// erste Zeile: Größe des Levels
+	// erste Zeile verwerfen
+	getline(&line, &len, worldFile);
+	line = NULL;
+	//zweite Zeile: Größe des Levels
 	getline(&line, &len, worldFile);
 	char *tok = strtok(line, ",");
 	sscanf(tok, "%d", &worldSizeY);

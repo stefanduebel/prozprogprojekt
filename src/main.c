@@ -19,7 +19,7 @@
 #include "menu.h"
 #include "game.h"
 
-#define FONT_SIZE 16
+#define FONT_SIZE 30
 
 Uint32 generate_userevent (Uint32 intervall, void *parameter)
 {
