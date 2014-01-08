@@ -24,7 +24,7 @@ Die Kernfunktionalitäten des Spieles sollen hierbei sein:
 * Persistenz: *(Murat)*
 	* speichern von Einstellungen
 	* speichern von Highscores
-* Hintergrundmusik
+* Hintergrundmusik *(Murat)*
 
 ## CodeStil
 
