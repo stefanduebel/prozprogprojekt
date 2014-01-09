@@ -196,6 +196,11 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				if(playerPositionX%blockSize && getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/blockSize+1, playerPositionX/blockSize+1) >= 0)
 				{playerPositionY = playerPositionY-playerPositionY%blockSize; v = 0;}
 
+				if(getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/blockSize, playerPositionX/blockSize) >= 0)
+				{playerPositionY = playerPositionY-playerPositionY%blockSize+blockSize;  v = 0;}
+				if(playerPositionX%blockSize && getBlock(&world[0][0], worldSizeX, worldSizeY, playerPositionY/blockSize, playerPositionX/blockSize+1) >= 0)
+				{playerPositionY = playerPositionY-playerPositionY%blockSize+blockSize; v = 0;}
+
 
 				// in vertikaler Richtung aus der Welt: zum Start zurücksetzen
 				if(playerPositionY < 0-blockSize || playerPositionY > worldSizeY*blockSize)
@@ -238,30 +243,22 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 					}
 				}
 
-				if((goLeft || goRight) && v == 0)
-				{
-					frame++;
-				}
-				else
-				{
-					frame = 39;
-				}
-
-				if(frame >= 35 && frame != 39)
-				{
-					frame = 0;
-				}
 
 				// Zeichne den Spieler
+				if((goLeft || goRight) && v == 0)
+				{frame++;}
+				else
+				{frame = 39;}
+
+				if(frame >= 35 && frame != 39)
+				{frame = 0;}
+
 				SDL_Rect playerSource;
 				playerSource.x = 36*(frame/5);
-
 				if(goLeft)
 				{playerSource.y = 48;}
-
-				if(goRight)
+				else if(goRight)
 				{playerSource.y = 0;}
-
 				playerSource.w = 36;
 				playerSource.h = 48;
 
