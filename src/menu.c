@@ -8,6 +8,7 @@
 #endif
 
 #include <SDL/SDL_ttf.h>
+#include <SDL/SDL_image.h>
 #include "menu.h"
 
 #define MENU_ITEMS 5
@@ -326,7 +327,8 @@ int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 	struct menu
 	{
 		char name[4];
-		SDL_Surface *surface;
+		SDL_Surface *selected;
+		SDL_Surface *unselected;
 		SDL_Rect position;
 		char * description;
 	} menuItem[items];
@@ -343,7 +345,6 @@ int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 	unsigned int itemsPerRow = (screen->clip_rect.w - (4 * MENU_PADDING)) / (itemBackgroundUnselected->clip_rect.w + MENU_PADDING);
 	unsigned int menuWidth = (itemsPerRow * itemBackgroundUnselected->clip_rect.w) + ((itemsPerRow-1)* MENU_PADDING);
 	unsigned int menuHeight = (((items / itemsPerRow) + 1) * itemBackgroundUnselected->clip_rect.h) + ((items / itemsPerRow) * MENU_PADDING);
-	printf("items per row: %d, width: %d, height: %d\n", itemsPerRow, menuWidth, menuHeight);
 
 	// rendere die einzelnen Menüeinträge in ihre jeweiligen Surfaces und bestimme die Gesamthöhe des Menüs
 	for (int i = 0; i < items; i++)
@@ -362,25 +363,27 @@ int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 		sprintf(menuItem[i].name, "%d", i+1);
 
 		// Hintergrundgrafik
-		if (i == selectedItem)
-			menuItem[i].surface = SDL_ConvertSurface(itemBackgroundSelected, itemBackgroundSelected->format, SDL_SWSURFACE);
-		else
-			menuItem[i].surface = SDL_ConvertSurface(itemBackgroundUnselected, itemBackgroundUnselected->format, SDL_SWSURFACE);
-		// rendere Text
-		SDL_Surface *textSurface = TTF_RenderText_Solid(font, menuItem[i].name, color[(i == selectedItem)]);
-		SDL_Rect textPos;
-		textPos.x = (itemBackgroundSelected->clip_rect.w / 2) - (textSurface->clip_rect.w / 2);
-		textPos.y = (itemBackgroundSelected->clip_rect.h / 2) - (textSurface->clip_rect.h / 2);
+		sprintf(filepath, "resources/images/thumbnails/level%dSelected.png", i);
+		menuItem[i].selected = IMG_Load(filepath);
+		sprintf(filepath, "resources/images/thumbnails/level%dUnselected.png", i);
+		menuItem[i].unselected = IMG_Load(filepath);
+		if ((!menuItem[i].unselected) || (!menuItem[i].selected))
+		{
+			menuItem[i].selected = SDL_ConvertSurface(itemBackgroundSelected, itemBackgroundSelected->format, SDL_SWSURFACE);
+			menuItem[i].unselected = SDL_ConvertSurface(itemBackgroundUnselected, itemBackgroundUnselected->format, SDL_SWSURFACE);
+			// rendere Text
+			SDL_Surface *textSurface = TTF_RenderText_Solid(font, menuItem[i].name, color[(i == selectedItem)]);
+			SDL_Rect textPos;
+			textPos.x = (itemBackgroundSelected->clip_rect.w / 2) - (textSurface->clip_rect.w / 2);
+			textPos.y = (itemBackgroundSelected->clip_rect.h / 2) - (textSurface->clip_rect.h / 2);
 
-		// zusammenfügen
-		SDL_BlitSurface(textSurface, NULL, menuItem[i].surface, &textPos);
-
-		SDL_Flip(menuItem[i].surface);
+			// zusammenfügen
+			SDL_BlitSurface(textSurface, NULL, menuItem[i].selected, &textPos);
+			SDL_BlitSurface(textSurface, NULL, menuItem[i].unselected, &textPos);
+		}
 
 		menuItem[i].position.x = ((screen->clip_rect.w - menuWidth) / 2) + ((i%itemsPerRow) * (itemBackgroundUnselected->clip_rect.w + MENU_PADDING));
 		menuItem[i].position.y = ((screen->clip_rect.h - menuHeight) / 2) + ((i/itemsPerRow) * (itemBackgroundUnselected->clip_rect.h + MENU_PADDING));
-
-		SDL_BlitSurface(menuItem[i].surface, NULL, screen, &(menuItem[i].position));
 	}
 	// warte auf Events
 	while(SDL_WaitEvent (&event))
@@ -401,16 +404,9 @@ int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 				for (int i = 0; i < items; i++)
 				{
 					if (i == selectedItem)
-						menuItem[i].surface = SDL_LoadBMP(MENU_BACKGROUND_SELECTED);
+						SDL_BlitSurface(menuItem[i].selected, NULL, screen, &(menuItem[i].position));
 					else
-						menuItem[i].surface = SDL_LoadBMP(MENU_BACKGROUND);
-					SDL_Surface *textSurface = TTF_RenderText_Solid(font, menuItem[i].name, color[(i == selectedItem)]);
-
-					SDL_Rect textPos;
-					textPos.x = (menuItem[i].surface->clip_rect.w / 2) - (textSurface->clip_rect.w / 2);
-					textPos.y = (menuItem[i].surface->clip_rect.h / 2) - (textSurface->clip_rect.h / 2);
-					SDL_BlitSurface(textSurface, NULL, menuItem[i].surface, &textPos);
-					SDL_BlitSurface(menuItem[i].surface, NULL, screen, &(menuItem[i].position));
+						SDL_BlitSurface(menuItem[i].unselected, NULL, screen, &(menuItem[i].position));
 				}
 				descriptionSurface = TTF_RenderText_Solid(font, menuItem[selectedItem].description, color[1]);
 				descriptionPosition.x = (screen->clip_rect.w / 2) - (descriptionSurface->clip_rect.w / 2);
