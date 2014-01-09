@@ -126,7 +126,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 
 
 	// lade Grafik für den Spieler
-	SDL_Surface *player = SDL_LoadBMP("resources/images/player.bmp");
+	SDL_Surface *player = IMG_Load("resources/images/player.png");
 
 	int playerPositionX = 0;
 	int playerPositionY = 0;
@@ -136,6 +136,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	double v = 0; // Vertikalgeschwindigkeit
 	double a = 0.6 * ((double) blockSize / 48); // Gravitation
 
+	int frame = 0;
 
 	// Kamera
 	int camPositionX = 0;
@@ -157,7 +158,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 			case SDL_USEREVENT:
 			{
 				// Spielerbewegung
-				playerPositionX = playerPositionX + (goRight - goLeft) * 9 * ((double) blockSize / 48);
+				playerPositionX = playerPositionX + (goRight - goLeft) * 3 * ((double) blockSize / 48);
 
 				// Kontrollieren ob Welt verlassen wurde (in horizontaler Richtung)
 				if(playerPositionX < 0)
@@ -234,16 +235,29 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 					}
 				}
 
+				if((goLeft || goRight) && v == 0)
+				{
+					frame++;
+				}
+				else
+				{
+					frame = 39;
+				}
+
+				if(frame >= 35 && frame != 39)
+				{
+					frame = 0;
+				}
 
 				// Zeichne den Spieler
 				SDL_Rect playerSource;
-				playerSource.x = 0;
+				playerSource.x = 36*(frame/5);
 				playerSource.y = 0;
-				playerSource.w = blockSize;
-				playerSource.h = blockSize;
+				playerSource.w = 36;
+				playerSource.h = 48;
 
 				SDL_Rect playerDestination;
-				playerDestination.x = playerPositionX-camPositionX;
+				playerDestination.x = playerPositionX+5-camPositionX;
 				playerDestination.y = playerPositionY;
 				playerDestination.w = blockSize;
 				playerDestination.h = blockSize;
