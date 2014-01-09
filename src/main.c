@@ -45,16 +45,8 @@ int main( int argc, char *argv[] )
 {
 	struct resolution res;
 
-	if (argc > 1)
-	{
-		res.width = 1280;
-		res.height = 720;
-	}
-	else
-	{
-		res.width = 640;
-		res.height = 480;
-	}
+	res.width = 1280;
+	res.height = 720;
 
 	// Load a font
 	TTF_Font *font;

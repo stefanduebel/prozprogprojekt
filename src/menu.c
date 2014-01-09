@@ -138,7 +138,6 @@ int drawMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 
 void drawSettingsMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct resolution *res)
 {
-	printf("zeichne Einstellungsmenü\n");
 	// Färbe den Hintergrund schwarz
 	SDL_FillRect(screen, &screen->clip_rect, SDL_MapRGB(screen->format, 0, 0, 0));
 
@@ -356,10 +355,8 @@ int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 		getline(&(menuItem[i].description), &len, levelFile);
 		if (menuItem[i].description[strlen(menuItem[i].description)-1] == '\n')
 			menuItem[i].description[strlen(menuItem[i].description)-1] = '\0';
-		printf("Der Name des Levels lautet %s\n", menuItem[i].description);
 
 		// Levelnummer als String speichern
-		printf("Name festlegen %d\n", i);
 		sprintf(menuItem[i].name, "%d", i+1);
 
 		// Hintergrundgrafik
