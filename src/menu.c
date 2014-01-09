@@ -325,11 +325,10 @@ int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 	// Struktur für einen einzelnen Menüeintrag (Name, Render-Fläche, Position, (zusätzlich könnte noch eine Beschreibung hinzugefügt werden))
 	struct menu
 	{
-		char name[4];
+		char * description;
 		SDL_Surface *selected;
 		SDL_Surface *unselected;
 		SDL_Rect position;
-		char * description;
 	} menuItem[items];
 
 	// ausgewählter Menü-Eintrag
@@ -356,9 +355,6 @@ int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 		if (menuItem[i].description[strlen(menuItem[i].description)-1] == '\n')
 			menuItem[i].description[strlen(menuItem[i].description)-1] = '\0';
 
-		// Levelnummer als String speichern
-		sprintf(menuItem[i].name, "%d", i+1);
-
 		// Hintergrundgrafik
 		sprintf(filepath, "resources/images/thumbnails/level%dSelected.png", i);
 		menuItem[i].selected = IMG_Load(filepath);
@@ -368,15 +364,6 @@ int drawLevelMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 		{
 			menuItem[i].selected = SDL_ConvertSurface(itemBackgroundSelected, itemBackgroundSelected->format, SDL_SWSURFACE);
 			menuItem[i].unselected = SDL_ConvertSurface(itemBackgroundUnselected, itemBackgroundUnselected->format, SDL_SWSURFACE);
-			// rendere Text
-			SDL_Surface *textSurface = TTF_RenderText_Solid(font, menuItem[i].name, color[(i == selectedItem)]);
-			SDL_Rect textPos;
-			textPos.x = (itemBackgroundSelected->clip_rect.w / 2) - (textSurface->clip_rect.w / 2);
-			textPos.y = (itemBackgroundSelected->clip_rect.h / 2) - (textSurface->clip_rect.h / 2);
-
-			// zusammenfügen
-			SDL_BlitSurface(textSurface, NULL, menuItem[i].selected, &textPos);
-			SDL_BlitSurface(textSurface, NULL, menuItem[i].unselected, &textPos);
 		}
 
 		menuItem[i].position.x = ((screen->clip_rect.w - menuWidth) / 2) + ((i%itemsPerRow) * (itemBackgroundUnselected->clip_rect.w + MENU_PADDING));
