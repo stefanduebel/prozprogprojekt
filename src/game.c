@@ -255,7 +255,13 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				// Zeichne den Spieler
 				SDL_Rect playerSource;
 				playerSource.x = 36*(frame/5);
-				playerSource.y = 0;
+
+				if(goLeft)
+				{playerSource.y = 48;}
+
+				if(goRight)
+				{playerSource.y = 0;}
+
 				playerSource.w = 36;
 				playerSource.h = 48;
 
