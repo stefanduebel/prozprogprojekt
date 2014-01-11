@@ -9,6 +9,7 @@
 #endif
 
 #include <SDL/SDL_ttf.h>
+#include <SDL/SDL_image.h>
 #include <SDL/SDL_mixer.h>
 
 #ifndef MAIN_H
@@ -72,6 +73,9 @@ int main( int argc, char *argv[] )
 		fprintf( stderr, "SDL konnte nicht initialisiert werden:  %s\n", SDL_GetError() );
 		return 1;
 	}
+
+	// Initialisiere SDL_Image
+	IMG_Init(IMG_INIT_PNG);
 
 	// Timer einrichten
 	SDL_AddTimer (16, generate_userevent, NULL);
