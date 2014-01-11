@@ -20,15 +20,16 @@
 // Strukturen
 struct object
 {
-	int type;             //Typ des Objekt (0 = Spieler; 1 = NPC; 2 = Statisch)
-	SDL_Surface *sprite;  //Pointer auf SDL-Surface, welches die Spritemap enthält
-	int posX;             //X-Position
-	int posY;             //Y-Position
-	int sizeX;            //Breite
-	int sizeY;            //Höhe
-	double v;             //Vertikal-Geschindigkeit
-	short moveDir;        //Bewegungsrichtung (-1 = Links; 1 = Rechts; 0 = Stehen)
-	int frame;            //Aktueller Animationsframe
+	int type;                //Typ des Objekt (0 = Spieler; 1 = NPC; 2 = Statisch)
+	SDL_Surface *sprite;     //Pointer auf SDL-Surface, welches die Spritemap enthält
+	int posX;                //X-Position
+	int posY;                //Y-Position
+	int sizeX;               //Breite
+	int sizeY;               //Höhe
+	double v;                //Vertikal-Geschindigkeit
+	short moveDir;           //Bewegungsrichtung (-1 = Links; 1 = Rechts)
+	unsigned int moveSpeed;  //Bewegungsgeschwindigkeit
+	int frame;               //Aktueller Animationsframe
 };
 
 
@@ -111,7 +112,7 @@ void objectAppend(struct objectListElement **lst, struct object *object)
 
 void objectDraw(SDL_Surface *screen, struct object *object)
 {
-	if(object->moveDir && object->v == 0)
+	if(object->moveSpeed && object->v == 0)
 	{object->frame++;}
 	else
 	{object->frame = 39;}
@@ -125,11 +126,10 @@ void objectDraw(SDL_Surface *screen, struct object *object)
 	source.w = object->sizeX;
 	source.h = object->sizeY;
 
-	if(object->moveDir >= 0)
+	if(object->moveDir > 0)
 	{source.y = 0;}
 	else if(object->moveDir < 0)
 	{source.y = object->sizeY;}
-
 
 	SDL_Rect destination;
 	destination.x = object->posX - camPosition.x;
@@ -146,7 +146,7 @@ void objectCollisionAndGravity(struct object *object, int *world)
 {
 	// Bewegung
 	if(object->type == 0 || (object->type == 1 && object->v == 0))
-	{object->posX = object->posX + object->moveDir * 3 * ((double) blockSize / 48);}
+	{object->posX = object->posX + object->moveDir * (int) object->moveSpeed * ((double) blockSize / 48);}
 
 	// Kontrollieren ob Welt verlassen wurde (in horizontaler Richtung)
 	if(object->posX < 0)
@@ -259,26 +259,29 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	struct objectListElement *objectList;
 	objectList = NULL;
 
-	//Variable zum Bearbeiten der Liste
+	// Variable zum Bearbeiten der Liste
 	struct objectListElement *liste;
 
 
 	// ============================== SPIELER ==============================
 	struct object player;
-	player.type    = 0;
-	player.posX    = 0;
-	player.posY    = 0;
-	player.sizeX   = 36;
-	player.sizeY   = 48;
-	player.v       = 0;
-	player.moveDir = 0;
-	player.frame   = 0;
+	player.type      = 0;
+	player.posX      = 0;
+	player.posY      = 0;
+	player.sizeX     = 36;
+	player.sizeY     = 48;
+	player.v         = 0;
+	player.moveDir   = 0;
+	player.moveSpeed = 0;
+	player.frame     = 0;
 
 	// lade Grafik für den Spieler
 	player.sprite = IMG_Load("resources/images/player.png");
 
 	objectAppend(&objectList, &player);
 
+	short playMoveLeft = 0;
+	short playMoveRight = 0;
 
 	// ============================== GEGNER ==============================
 	struct object *enemy;
@@ -288,14 +291,15 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	{
 		enemy = (struct object*) malloc(sizeof(*enemy));
 
-		enemy->type    = 1;
-		enemy->posX    = blockSize * (counter + 2);
-		enemy->posY    = 0;
-		enemy->sizeX   = 36;
-		enemy->sizeY   = 48;
-		enemy->v       = 0;
-		enemy->moveDir = 1;
-		enemy->frame   = 0;
+		enemy->type      = 1;
+		enemy->posX      = blockSize * (counter + 2);
+		enemy->posY      = 0;
+		enemy->sizeX     = 36;
+		enemy->sizeY     = 48;
+		enemy->v         = 0;
+		enemy->moveDir   = 1;
+		enemy->moveSpeed = 3;
+		enemy->frame     = 0;
 
 		// lade Grafik für den Spieler
 		enemy->sprite = IMG_Load("resources/images/player.png");
@@ -324,6 +328,15 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 			// Timer-Event: Bildschirm neu zeichnen
 			case SDL_USEREVENT:
 			{
+				// ============================== LOGIK ==============================
+				// Spielersteuerung
+				if(playMoveLeft && playMoveRight == 0)
+				{player.moveDir = -1; player.moveSpeed = 3; }
+				else if(playMoveRight && playMoveLeft == 0)
+				{player.moveDir = 1; player.moveSpeed = 3;}
+				else
+				{player.moveSpeed = 0;}
+
 				// Bewegung für alle Objekte
 				liste=objectList;
 				objectCollisionAndGravity( liste->object, &world);
@@ -348,9 +361,9 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				{camPosition.x = worldSizeX*blockSize-res.width;}
 
 
+				// ============================== RENDERN ==============================
 				// Lösche den Hintergrund
 				SDL_FillRect( screen, NULL, color );
-				//backgroundSource.x = (int) ( (((double)camPosition.x/(worldSizeX*blockSize-res.width))) * (background->clip_rect.w-res.width) );
 
 
 				// Zeichne alle Blöcke
@@ -384,11 +397,11 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				{
 					// Pfeil-Links
 					case SDLK_LEFT:
-						player.moveDir = -1;
+						playMoveLeft = 1;
 						break;
 					// Pfeil-Rechts
 					case SDLK_RIGHT:
-						player.moveDir = 1;
+						playMoveRight = 1;
 						break;
 					// Leertaster
 					case SDLK_SPACE:
@@ -415,12 +428,10 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				switch(event.key.keysym.sym)
 				{
 					case SDLK_LEFT:
-						if(player.moveDir == -1)
-						{player.moveDir = 0;}
+						playMoveLeft = 0;
 						break;
 					case SDLK_RIGHT:
-						if(player.moveDir == 1)
-						{player.moveDir = 0;}
+						playMoveRight = 0;
 						break;
 					default:
 						break;
