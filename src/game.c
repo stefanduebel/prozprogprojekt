@@ -188,6 +188,38 @@ void objectCollisionAndGravity(struct object *object, int *world)
 }
 
 
+unsigned short objectCollisionToObject(struct object *object1, struct object *object2)
+{
+	unsigned short hitbox = 0;
+
+	if( object1->posX                  >= object2->posX                  &&
+	    object1->posX                  <= object2->posX + object2->sizeX &&
+	    object1->posY                  >= object2->posY                  &&
+	    object1->posY                  <= object2->posY + object2->sizeY    )
+	{hitbox += 1;}
+
+	if( object1->posX + object1->sizeX >= object2->posX                  &&
+	    object1->posX + object1->sizeX <= object2->posX + object2->sizeX &&
+	    object1->posY                  >= object2->posY                  &&
+	    object1->posY                  <= object2->posY + object2->sizeY    )
+	{hitbox += 2;}
+
+	if( object1->posX                  >= object2->posX                  &&
+	    object1->posX                  <= object2->posX + object2->sizeX &&
+	    object1->posY + object1->sizeY >= object2->posY                  &&
+	    object1->posY + object1->sizeY <= object2->posY + object2->sizeY    )
+	{hitbox += 4;}
+
+	if( object1->posX + object1->sizeX >= object2->posX                  &&
+	    object1->posX + object1->sizeX <= object2->posX + object2->sizeX &&
+	    object1->posY + object1->sizeY >= object2->posY                  &&
+	    object1->posY + object1->sizeY <= object2->posY + object2->sizeY    )
+	{hitbox += 8;}
+
+	return hitbox;
+}
+
+
 int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int level)
 {
 	int quit = 0;
@@ -287,7 +319,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	struct object *enemy;
 
 	int counter = 0;
-	for(counter = 0; counter < 20; counter++)
+	for(counter = 0; counter < 1; counter++)
 	{
 		enemy = (struct object*) malloc(sizeof(*enemy));
 
@@ -312,7 +344,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	// Variable ist Global
 	camPosition.x = 0;
 
-
+	short hitbox;
 	// Main-Loop
 	while(SDL_WaitEvent (&event))
 	{
@@ -346,11 +378,24 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 					objectCollisionAndGravity( liste->object, &world);
 				}
 
-
 				// Spieler in vertikaler Richtung aus der Welt
 				if(player.posY < 0-blockSize || player.posY > worldSizeY*blockSize)
 				{return 1;}
 
+				// Kollision zwischen Spieler und Objekt
+				liste=objectList;
+				while (liste->next != NULL)
+				{
+					liste=liste->next;
+
+					hitbox = objectCollisionToObject(&player, liste->object);
+
+					if(hitbox) 
+					{
+						printf("%d\n", hitbox);
+						liste->object->moveDir = -liste->object->moveDir;
+					}
+				}
 
 				// Kamera
 				camPosition.x += ((player.posX - res.width / 2 + blockSize / 2) - camPosition.x) / 10;
