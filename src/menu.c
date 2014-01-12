@@ -246,7 +246,7 @@ void drawSettingsMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, stru
 						if (selectedItem == 0)
 						{
 							res->width = 1920;
-							res->height = 720;
+							res->height = 1080;
 							if (screen->flags & SDL_FULLSCREEN)
 								screen = SDL_SetVideoMode( res->width, res->height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
 							else
