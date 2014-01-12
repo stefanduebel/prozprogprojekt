@@ -345,7 +345,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	struct object *enemy;
 
 	int counter = 0;
-	for(counter = 0; counter < 1; counter++)
+	for(counter = 0; counter < 50; counter++)
 	{
 		enemy = (struct object*) malloc(sizeof(*enemy));
 
@@ -479,10 +479,40 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 						if(player.v == 0)
 							{player.v = -9 * ((double) blockSize / 48);}
 						break;
+
 					// Pfeil hoch
 					case SDLK_UP:
 						a *= -1;
 						break;
+					// W
+					case SDLK_w:
+						if(world[(player.posY + player.sizeY / 2) / blockSize - 1][(player.posX + player.sizeX / 2) / blockSize    ] < 128)
+						{  world[(player.posY + player.sizeY / 2) / blockSize - 1][(player.posX + player.sizeX / 2) / blockSize    ] = 255;}
+						else
+						{  world[(player.posY + player.sizeY / 2) / blockSize - 1][(player.posX + player.sizeX / 2) / blockSize    ] = 4;}
+						break;
+					// S
+					case SDLK_s:
+						if(world[(player.posY + player.sizeY / 2) / blockSize + 1][(player.posX + player.sizeX / 2) / blockSize    ] < 128)
+						{  world[(player.posY + player.sizeY / 2) / blockSize + 1][(player.posX + player.sizeX / 2) / blockSize    ] = 255;}
+						else
+						{  world[(player.posY + player.sizeY / 2) / blockSize + 1][(player.posX + player.sizeX / 2) / blockSize    ] = 4;}
+						break;
+					// A
+					case SDLK_a:
+						if(world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize - 1] < 128)
+						{  world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize - 1] = 255;}
+						else
+						{  world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize - 1] = 4;}
+						break;
+					// D
+					case SDLK_d:
+						if(world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize + 1] < 128)
+						{  world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize + 1] = 255;}
+						else
+						{  world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize + 1] = 4;}
+						break;
+
 					// Escape
 					case SDLK_ESCAPE:
 						quit = 1;
