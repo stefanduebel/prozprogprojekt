@@ -14,7 +14,7 @@
 #define MENU_ITEMS 5
 #define MENU_PADDING 20
 
-#define RESOLUTION_NUM 2
+#define RESOLUTION_NUM 5
 
 int drawMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event)
 {
@@ -156,10 +156,13 @@ void drawSettingsMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, stru
 	short selectedItem = 0;
 
 	// initialisiere Namen der Einträge
-	menuItem[0].name = "1280 x 720"; 
-	menuItem[1].name = "640 x 480";
-	menuItem[2].name = "Fullscreen";
-	menuItem[3].name = "zurueck";
+	menuItem[0].name = "1920 x 1080 (HD1080p)";
+	menuItem[1].name = "1280 x 720 (HD720p)";
+	menuItem[2].name = "848 x 480 (WGA)";
+	menuItem[3].name = "640 x 480 (VGA)";
+	menuItem[4].name = "320 x 240 (QVGA)";
+	menuItem[5].name = "Fullscreen";
+	menuItem[6].name = "zurueck";
 
 	// Gesamthöhe des Menüs, zunächst nur die Zwischenräume
 	unsigned int menuHeight = (RESOLUTION_NUM + 2) * MENU_PADDING;
@@ -242,7 +245,7 @@ void drawSettingsMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, stru
 					case SDLK_RETURN:
 						if (selectedItem == 0)
 						{
-							res->width = 1280;
+							res->width = 1920;
 							res->height = 720;
 							if (screen->flags & SDL_FULLSCREEN)
 								screen = SDL_SetVideoMode( res->width, res->height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
@@ -251,8 +254,8 @@ void drawSettingsMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, stru
 						}
 						if (selectedItem == 1)
 						{
-							res->width = 640;
-							res->height = 480;
+							res->width = 1280;
+							res->height = 720;
 							if (screen->flags & SDL_FULLSCREEN)
 								screen = SDL_SetVideoMode( res->width, res->height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
 							else
@@ -261,12 +264,39 @@ void drawSettingsMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, stru
 						}
 						if (selectedItem == 2)
 						{
-							if (!(screen->flags & (SDL_FULLSCREEN)))
+							res->width = 848;
+							res->height = 480;
+							if (screen->flags & SDL_FULLSCREEN)
 								screen = SDL_SetVideoMode( res->width, res->height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
 							else
 								screen = SDL_SetVideoMode( res->width, res->height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF);
 						}
 						if (selectedItem == 3)
+						{
+							res->width = 640;
+							res->height = 480;
+							if (screen->flags & SDL_FULLSCREEN)
+								screen = SDL_SetVideoMode( res->width, res->height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
+							else
+								screen = SDL_SetVideoMode( res->width, res->height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF);
+						}
+						if (selectedItem == 4)
+						{
+							res->width = 320;
+							res->height = 240;
+							if (screen->flags & SDL_FULLSCREEN)
+								screen = SDL_SetVideoMode( res->width, res->height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
+							else
+								screen = SDL_SetVideoMode( res->width, res->height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF);
+						}
+						if (selectedItem == 5)
+						{
+							if (!(screen->flags & (SDL_FULLSCREEN)))
+								screen = SDL_SetVideoMode( res->width, res->height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
+							else
+								screen = SDL_SetVideoMode( res->width, res->height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF);
+						}
+						if (selectedItem == 6)
 							return;
 
 						// bereits ausgegebene Menühöhe

@@ -11,6 +11,7 @@
 #include <SDL/SDL_image.h>
 
 #include "game.h"
+#include "image.h"
 
 #define BLOCK_SET_WIDTH   10
 #define BLOCK_SET_HEIGHT  10
@@ -281,14 +282,11 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	while (row < worldSizeY)
 	{
 		getline(&line, &len, worldFile);
-		printf("Zeile: %s\n", line);
-		
 		tok = strtok(line, ",");
 		column = 0;
 		// lese einzelnen Elemente ein
 		while (tok)
 		{
-			printf("Token: %s\n", tok);
 			sscanf(tok, "%d", &world[row][column]);
 			
 			column++;
@@ -308,9 +306,10 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	int y;
 
 	// Lade Grafik für die Blöcke
-	sprintf(filepath, "resources/images/blocks_%d.png", blockSize);
-	SDL_Surface *blockset = IMG_Load(filepath);
-
+	SDL_Surface *tmp = IMG_Load("resources/images/blocks.png");
+	// skaliere Grafik
+	SDL_Surface *blockset = shrinkSurface(tmp, blockSize * BLOCK_SET_WIDTH, blockSize * BLOCK_SET_HEIGHT);
+	SDL_FreeSurface(tmp);
 
 	// ============================== OBJEKTE ==============================
 	struct objectListElement *objectList;
@@ -325,15 +324,17 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	player.type      = 0;
 	player.posX      = 0;
 	player.posY      = 0;
-	player.sizeX     = 36;
-	player.sizeY     = 48;
+	player.sizeX     = ((double) 36/48) * blockSize;
+	player.sizeY     = blockSize;
 	player.v         = 0;
 	player.moveDir   = 0;
 	player.moveSpeed = 0;
 	player.frame     = 0;
 
 	// lade Grafik für den Spieler
-	player.sprite = IMG_Load("resources/images/player.png");
+	SDL_Surface *tmp1 = IMG_Load("resources/images/player_final.png");
+	player.sprite = shrinkSurface(tmp1, (int)((double) 36/48 * blockSize * 10), blockSize*2);
+	SDL_FreeSurface(tmp1);
 
 	objectAppend(&objectList, &player);
 
@@ -352,15 +353,17 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 		enemy->type      = 1;
 		enemy->posX      = blockSize * (counter + 2);
 		enemy->posY      = 0;
-		enemy->sizeX     = 36;
-		enemy->sizeY     = 48;
+		enemy->sizeX     = (int) ((double) 36 / 48 * blockSize);
+		enemy->sizeY     = blockSize;
 		enemy->v         = 0;
 		enemy->moveDir   = 1;
 		enemy->moveSpeed = 3;
 		enemy->frame     = 0;
 
 		// lade Grafik für den Spieler
-		enemy->sprite = IMG_Load("resources/images/player.png");
+		SDL_Surface *tmp2 = IMG_Load("resources/images/player_final.png");
+		enemy->sprite = shrinkSurface(tmp2,  ((double) 36/48) * blockSize * 10, blockSize * 2);
+		SDL_FreeSurface(tmp2);
 
 		objectAppend(&objectList, enemy);
 	}

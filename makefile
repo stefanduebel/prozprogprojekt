@@ -13,8 +13,8 @@ OBJDIR = bin/obj
 
 all: game
 
-game: init $(OBJDIR)/main.o $(OBJDIR)/game.o $(OBJDIR)/menu.o
-	$(CC) $(OBJDIR)/main.o $(OBJDIR)/game.o $(OBJDIR)/menu.o $(CFLAGS) $(SDL) -o bin/game
+game: init $(OBJDIR)/main.o $(OBJDIR)/game.o $(OBJDIR)/menu.o $(OBJDIR)/image.o
+	$(CC) $(OBJDIR)/main.o $(OBJDIR)/game.o $(OBJDIR)/menu.o $(OBJDIR)/image.o $(CFLAGS) $(SDL) -o bin/game
 
 init:
 	mkdir -p bin
@@ -28,6 +28,9 @@ $(OBJDIR)/game.o: src/game.c
 
 $(OBJDIR)/menu.o: src/menu.c
 	$(CC) src/menu.c $(CFLAGS) $(SDL) -c -o $(OBJDIR)/menu.o
+
+$(OBJDIR)/image.o: src/image.c
+	$(CC) src/image.c $(CFLAGS) $(SDL) -c -o $(OBJDIR)/image.o
 
 clean:
 	rm -Rf bin
