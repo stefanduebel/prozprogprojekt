@@ -72,7 +72,7 @@ void blockDraw(SDL_Surface *screen, SDL_Surface *bitmap, int x, int y, int block
 }
 
 
-int blockGet(int *world, int y, int x)
+unsigned char blockGet(unsigned char *world, int x, int y)
 {
 	// wenn existierender Block -> den Typ zurückgeben
 	if(x >= 0 && x < worldSizeX && y >= 0 && y < worldSizeY)
@@ -142,55 +142,55 @@ void objectDraw(SDL_Surface *screen, struct object *object)
 }
 
 
-void objectCollisionAndGravity(struct object *object, int *world)
+void objectCollisionToWorldX(struct object *object, unsigned char *world)
 {
-	// Bewegung
-	if(object->type == 0 || (object->type == 1 && object->v == 0))
-	{object->posX = object->posX + object->moveDir * (int) object->moveSpeed * ((double) blockSize / 48);}
-
-	// Kontrollieren ob Welt verlassen wurde (in horizontaler Richtung)
-	if(object->posX < 0)
-	{object->posX = 0;}
-	else if(object->posX > (worldSizeX-1)*blockSize)
-	{object->posX = (worldSizeX-1)*blockSize;}
-
-	// X-Kollision
-	if(blockGet(world, object->posY/blockSize, object->posX/blockSize) < 128)
-	{object->posX = object->posX-object->posX%blockSize+blockSize; if(object->type){object->moveDir = -object->moveDir;}}
-	// verhindere das setzen auf einen Block wenn man gegen diesen springt
-	if(object->posY%blockSize && blockGet(world, object->posY/blockSize+1, object->posX/blockSize) < 128)
-	{object->posX = object->posX-object->posX%blockSize+blockSize; if(object->type){object->moveDir = -object->moveDir;}}
-
-	// X-Kollision von der anderen Seite
-	if(blockGet(world,object->posY/blockSize, object->posX/blockSize+1) < 128)
-	{object->posX = object->posX-object->posX%blockSize; if(object->type){object->moveDir = -object->moveDir;}}
-	// verhindere das setzen auf einen Block wenn man gegen diesen springt
-	if(object->posY%blockSize && blockGet(world, object->posY/blockSize+1, object->posX/blockSize+1) < 128)
-	{object->posX = object->posX-object->posX%blockSize; if(object->type){object->moveDir = -object->moveDir;}}
-
-	// Gravitation
-	if(object->posY <= worldSizeY*blockSize)
+	if( blockGet( world, (object->posX                    ) / blockSize,
+	                     (object->posY                 + 1) / blockSize  ) < 128 ||
+	    blockGet( world, (object->posX                    ) / blockSize,
+	                     (object->posY + object->sizeY - 1) / blockSize  ) < 128    )
 	{
-		object->v += a;
-		object->posY += object->v;
+		object->posX +=   blockSize -         (object->posX % blockSize);
+		if(object->type == 1)
+		{object->moveDir = -object->moveDir;}
 	}
 
-	// Y-Kollision: nicht durch Blöcke hindurchfallen
-	if(blockGet(world, object->posY/blockSize+1, object->posX/blockSize) < 128)
-	{object->posY = object->posY-object->posY%blockSize;  object->v = 0;}
-	if(object->posX%blockSize && blockGet(world, object->posY/blockSize+1, object->posX/blockSize+1) < 128)
-	{object->posY = object->posY-object->posY%blockSize; object->v = 0;}
-
-	if(blockGet(world, object->posY/blockSize, object->posX/blockSize) < 128)
-	{object->posY = object->posY-object->posY%blockSize+blockSize;  object->v = 0;}
-	if(object->posX%blockSize && blockGet(world, object->posY/blockSize, object->posX/blockSize+1) < 128)
-	{object->posY = object->posY-object->posY%blockSize+blockSize; object->v = 0;}
+	if( blockGet( world, (object->posX + object->sizeX    ) / blockSize,
+	                     (object->posY                 + 1) / blockSize  ) < 128 ||
+	    blockGet( world, (object->posX + object->sizeX    ) / blockSize,
+	                     (object->posY + object->sizeY - 1) / blockSize  ) < 128    )
+	{
+		object->posX -=  (object->posX + object->sizeX    ) % blockSize;
+		if(object->type == 1)
+		{object->moveDir = -object->moveDir;}
+	}
 }
 
 
-unsigned short objectCollisionToObject(struct object *object1, struct object *object2)
+void objectCollisionToWorldY(struct object *object, unsigned char *world)
 {
-	unsigned short hitbox = 0;
+	if( blockGet( world, (object->posX                 + 1) / blockSize,
+	                     (object->posY                    ) / blockSize  ) < 128 ||
+	    blockGet( world, (object->posX + object->sizeX - 1) / blockSize,
+	                     (object->posY                    ) / blockSize  ) < 128    )
+	{
+		object->posY +=   blockSize -         (object->posY % blockSize);
+		object->v = 0;
+	}
+
+	if( blockGet( world, (object->posX                 + 1) / blockSize,
+	                     (object->posY + object->sizeY    ) / blockSize  ) < 128 ||
+	    blockGet( world, (object->posX + object->sizeX - 1) / blockSize,
+	                     (object->posY + object->sizeY    ) / blockSize  ) < 128    )
+	{
+		object->posY -=  (object->posY + object->sizeY    ) % blockSize;
+		object->v = 0;
+	}
+}
+
+
+unsigned char objectCollisionToObject(struct object *object1, struct object *object2)
+{
+	unsigned char hitbox = 0;
 
 	if( object1->posX                  >= object2->posX                  &&
 	    object1->posX                  <= object2->posX + object2->sizeX &&
@@ -217,6 +217,31 @@ unsigned short objectCollisionToObject(struct object *object1, struct object *ob
 	{hitbox += 8;}
 
 	return hitbox;
+}
+
+
+void objectCollisionAndGravity(struct object *object, unsigned char *world)
+{
+	// Bewegung
+	if(object->type == 0 || (object->type == 1 && object->v == 0))
+	{object->posX = object->posX + object->moveDir * (int) object->moveSpeed * ((double) blockSize / 48);}
+
+	// Kontrollieren ob Welt verlassen wurde (in horizontaler Richtung)
+	if(object->posX < 0)
+	{object->posX = 0;}
+	else if(object->posX > (worldSizeX-1)*blockSize)
+	{object->posX = (worldSizeX-1)*blockSize;}
+
+	objectCollisionToWorldX(object, world);
+
+	// Gravitation
+	if(object->posY <= worldSizeY*blockSize)
+	{
+		object->v += a;
+		object->posY += object->v;
+	}
+
+	objectCollisionToWorldY(object, world);
 }
 
 
@@ -248,7 +273,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	tok = strtok(NULL, ",");
 	sscanf(tok, "%d", &worldSizeX);
 
-	int world[worldSizeY][worldSizeX];
+	unsigned char world[worldSizeY][worldSizeX];
 	int column = 0;
 	int row = 0;
 
@@ -315,6 +340,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	short playMoveLeft = 0;
 	short playMoveRight = 0;
 
+
 	// ============================== GEGNER ==============================
 	struct object *enemy;
 
@@ -344,7 +370,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	// Variable ist Global
 	camPosition.x = 0;
 
-	short hitbox;
+	unsigned char hitbox;
 	// Main-Loop
 	while(SDL_WaitEvent (&event))
 	{
@@ -382,7 +408,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				if(player.posY < 0-blockSize || player.posY > worldSizeY*blockSize)
 				{return 1;}
 
-				// Kollision zwischen Spieler und Objekt
+				// Kollision zwischen Spieler und Objekten
 				liste=objectList;
 				while (liste->next != NULL)
 				{
@@ -416,7 +442,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				{
 					for(x = camPosition.x/blockSize; x < camPosition.x/blockSize+res.width/blockSize+2; x++)
 					{
-						blockDraw(screen, blockset, x, y, blockGet(&world[0][0], y, x));
+						blockDraw(screen, blockset, x, y, blockGet(&world[0][0], x, y));
 					}
 				}
 
