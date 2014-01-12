@@ -145,22 +145,34 @@ void objectDraw(SDL_Surface *screen, struct object *object)
 
 void objectCollisionToWorldX(struct object *object, unsigned char *world)
 {
+	// Kollision nach links
 	if( blockGet( world, (object->posX                    ) / blockSize,
 	                     (object->posY                 + 1) / blockSize  ) < 128 ||
 	    blockGet( world, (object->posX                    ) / blockSize,
-	                     (object->posY + object->sizeY - 1) / blockSize  ) < 128    )
+	                     (object->posY + object->sizeY - 1) / blockSize  ) < 128 ||
+	    object->posX < 0                                                            )
 	{
-		object->posX +=   blockSize -         (object->posX % blockSize);
+		if(object->posX >= 0)
+		{object->posX +=  blockSize -         (object->posX % blockSize);}
+		else
+		{object->posX = 0;}
+
 		if(object->type == 1)
 		{object->moveDir = -object->moveDir;}
 	}
 
+	// Kollision nach rechts
 	if( blockGet( world, (object->posX + object->sizeX    ) / blockSize,
 	                     (object->posY                 + 1) / blockSize  ) < 128 ||
 	    blockGet( world, (object->posX + object->sizeX    ) / blockSize,
-	                     (object->posY + object->sizeY - 1) / blockSize  ) < 128    )
+	                     (object->posY + object->sizeY - 1) / blockSize  ) < 128 ||
+	    object->posX + object->sizeX > worldSizeX * blockSize                       )
 	{
-		object->posX -=  (object->posX + object->sizeX    ) % blockSize;
+		if(object->posX + object->sizeX <= worldSizeX * blockSize)
+		{object->posX -= (object->posX + object->sizeX    ) % blockSize;}
+		else
+		{object->posX = worldSizeX * blockSize - object->sizeX;}
+
 		if(object->type == 1)
 		{object->moveDir = -object->moveDir;}
 	}
@@ -169,6 +181,7 @@ void objectCollisionToWorldX(struct object *object, unsigned char *world)
 
 void objectCollisionToWorldY(struct object *object, unsigned char *world)
 {
+	// Kollsion nach oben
 	if( blockGet( world, (object->posX                 + 1) / blockSize,
 	                     (object->posY                    ) / blockSize  ) < 128 ||
 	    blockGet( world, (object->posX + object->sizeX - 1) / blockSize,
@@ -178,6 +191,7 @@ void objectCollisionToWorldY(struct object *object, unsigned char *world)
 		object->v = 0;
 	}
 
+	// Kollision nach unten
 	if( blockGet( world, (object->posX                 + 1) / blockSize,
 	                     (object->posY + object->sizeY    ) / blockSize  ) < 128 ||
 	    blockGet( world, (object->posX + object->sizeX - 1) / blockSize,
@@ -226,12 +240,6 @@ void objectCollisionAndGravity(struct object *object, unsigned char *world)
 	// Bewegung
 	if(object->type == 0 || (object->type == 1 && object->v == 0))
 	{object->posX = object->posX + object->moveDir * (int) object->moveSpeed * ((double) blockSize / 48);}
-
-	// Kontrollieren ob Welt verlassen wurde (in horizontaler Richtung)
-	if(object->posX < 0)
-	{object->posX = 0;}
-	else if(object->posX > (worldSizeX-1)*blockSize)
-	{object->posX = (worldSizeX-1)*blockSize;}
 
 	objectCollisionToWorldX(object, world);
 
