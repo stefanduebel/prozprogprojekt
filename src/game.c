@@ -485,14 +485,18 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 					case SDLK_RIGHT:
 						playMoveRight = 1;
 						break;
-					// Leertaster
+					// Springen
 					case SDLK_SPACE:
+						if(player.v == 0)
+							{player.v = -9 * ((double) blockSize / 48);}
+						break;
+					case SDLK_UP:
 						if(player.v == 0)
 							{player.v = -9 * ((double) blockSize / 48);}
 						break;
 
 					// Pfeil hoch
-					case SDLK_UP:
+					case SDLK_q:
 						a *= -1;
 						break;
 					// W
