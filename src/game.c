@@ -55,8 +55,8 @@ void blockDraw(SDL_Surface *screen, SDL_Surface *bitmap, int x, int y, int block
 	{
 		// Ausschnitt aus der Blöckebitmap welche einen Block beinhaltet
 		SDL_Rect source;
-		source.x = blocktype * blockSize;
-		source.y = 0;
+		source.x = blocktype % BLOCK_SET_WIDTH * blockSize;
+		source.y = blocktype / BLOCK_SET_HEIGHT * blockSize;
 		source.w = blockSize;
 		source.h = blockSize;
 
@@ -435,8 +435,10 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				{
 					case 50:
 						world[playerBlockY][playerBlockX] = 255;
+						break;
 					case 55:
 						return 0;
+						break;
 				}
 
 				// Kollision zwischen Spieler und Objekten
