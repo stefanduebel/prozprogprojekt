@@ -55,8 +55,8 @@ void blockDraw(SDL_Surface *screen, SDL_Surface *bitmap, int x, int y, int block
 	{
 		// Ausschnitt aus der Blöckebitmap welche einen Block beinhaltet
 		SDL_Rect source;
-		source.x = blocktype % BLOCK_SET_WIDTH * blockSize;
-		source.y = blocktype / BLOCK_SET_HEIGHT * blockSize;
+		source.x = blocktype * blockSize;
+		source.y = 0;
 		source.w = blockSize;
 		source.h = blockSize;
 
@@ -147,9 +147,9 @@ void objectCollisionToWorldX(struct object *object, unsigned char *world)
 {
 	// Kollision nach links
 	if( blockGet( world, (object->posX                    ) / blockSize,
-	                     (object->posY                 + 1) / blockSize  ) < 128 ||
+	                     (object->posY                 + 1) / blockSize  ) < 50 ||
 	    blockGet( world, (object->posX                    ) / blockSize,
-	                     (object->posY + object->sizeY - 1) / blockSize  ) < 128 ||
+	                     (object->posY + object->sizeY - 1) / blockSize  ) < 50 ||
 	    object->posX < 0                                                            )
 	{
 		if(object->posX >= 0)
@@ -163,9 +163,9 @@ void objectCollisionToWorldX(struct object *object, unsigned char *world)
 
 	// Kollision nach rechts
 	if( blockGet( world, (object->posX + object->sizeX    ) / blockSize,
-	                     (object->posY                 + 1) / blockSize  ) < 128 ||
+	                     (object->posY                 + 1) / blockSize  ) < 50 ||
 	    blockGet( world, (object->posX + object->sizeX    ) / blockSize,
-	                     (object->posY + object->sizeY - 1) / blockSize  ) < 128 ||
+	                     (object->posY + object->sizeY - 1) / blockSize  ) < 50 ||
 	    object->posX + object->sizeX > worldSizeX * blockSize                       )
 	{
 		if(object->posX + object->sizeX <= worldSizeX * blockSize)
@@ -183,9 +183,9 @@ void objectCollisionToWorldY(struct object *object, unsigned char *world)
 {
 	// Kollsion nach oben
 	if( blockGet( world, (object->posX                 + 1) / blockSize,
-	                     (object->posY                    ) / blockSize  ) < 128 ||
+	                     (object->posY                    ) / blockSize  ) < 50 ||
 	    blockGet( world, (object->posX + object->sizeX - 1) / blockSize,
-	                     (object->posY                    ) / blockSize  ) < 128    )
+	                     (object->posY                    ) / blockSize  ) < 50    )
 	{
 		object->posY +=   blockSize -         (object->posY % blockSize);
 		object->v = 0;
@@ -193,9 +193,9 @@ void objectCollisionToWorldY(struct object *object, unsigned char *world)
 
 	// Kollision nach unten
 	if( blockGet( world, (object->posX                 + 1) / blockSize,
-	                     (object->posY + object->sizeY    ) / blockSize  ) < 128 ||
+	                     (object->posY + object->sizeY    ) / blockSize  ) < 50 ||
 	    blockGet( world, (object->posX + object->sizeX - 1) / blockSize,
-	                     (object->posY + object->sizeY    ) / blockSize  ) < 128    )
+	                     (object->posY + object->sizeY    ) / blockSize  ) < 50    )
 	{
 		object->posY -=  (object->posY + object->sizeY    ) % blockSize;
 		object->v = 0;
@@ -348,7 +348,8 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 
 	short playMoveLeft = 0;
 	short playMoveRight = 0;
-
+	unsigned int playerBlockX = 0;
+	unsigned int playerBlockY = 0;
 
 	// ============================== GEGNER ==============================
 	struct object *enemy;
@@ -419,6 +420,17 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				if(player.posY < 0-blockSize || player.posY > worldSizeY*blockSize)
 				{return 1;}
 
+				// Blocklogik
+				playerBlockX = (player.posX + player.sizeX / 2) / blockSize;
+				playerBlockY = (player.posY + player.sizeY / 2) / blockSize;
+				switch(world[playerBlockY][playerBlockX])
+				{
+					case 50:
+						world[playerBlockY][playerBlockX] = 255;
+					case 55:
+						return 0;
+				}
+
 				// Kollision zwischen Spieler und Objekten
 				liste=objectList;
 				while (liste->next != NULL)
@@ -429,7 +441,6 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 
 					if(hitbox) 
 					{
-						printf("%d\n", hitbox);
 						liste->object->moveDir = -liste->object->moveDir;
 					}
 				}
@@ -501,28 +512,28 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 						break;
 					// W
 					case SDLK_w:
-						if(world[(player.posY + player.sizeY / 2) / blockSize - 1][(player.posX + player.sizeX / 2) / blockSize    ] < 128)
+						if(world[(player.posY + player.sizeY / 2) / blockSize - 1][(player.posX + player.sizeX / 2) / blockSize    ] < 50)
 						{  world[(player.posY + player.sizeY / 2) / blockSize - 1][(player.posX + player.sizeX / 2) / blockSize    ] = 255;}
 						else
 						{  world[(player.posY + player.sizeY / 2) / blockSize - 1][(player.posX + player.sizeX / 2) / blockSize    ] = 4;}
 						break;
 					// S
 					case SDLK_s:
-						if(world[(player.posY + player.sizeY / 2) / blockSize + 1][(player.posX + player.sizeX / 2) / blockSize    ] < 128)
+						if(world[(player.posY + player.sizeY / 2) / blockSize + 1][(player.posX + player.sizeX / 2) / blockSize    ] < 50)
 						{  world[(player.posY + player.sizeY / 2) / blockSize + 1][(player.posX + player.sizeX / 2) / blockSize    ] = 255;}
 						else
 						{  world[(player.posY + player.sizeY / 2) / blockSize + 1][(player.posX + player.sizeX / 2) / blockSize    ] = 4;}
 						break;
 					// A
 					case SDLK_a:
-						if(world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize - 1] < 128)
+						if(world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize - 1] < 50)
 						{  world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize - 1] = 255;}
 						else
 						{  world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize - 1] = 4;}
 						break;
 					// D
 					case SDLK_d:
-						if(world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize + 1] < 128)
+						if(world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize + 1] < 50)
 						{  world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize + 1] = 255;}
 						else
 						{  world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize + 1] = 4;}
