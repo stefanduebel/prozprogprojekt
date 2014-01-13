@@ -44,7 +44,7 @@ struct objectListElement
 // Globlale Variablen
 int worldSizeX;
 int worldSizeY;
-unsigned short blockSize;
+int blockSize;
 double a;
 struct {int x;} camPosition;
 
@@ -295,7 +295,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 		// lese einzelnen Elemente ein
 		while (tok)
 		{
-			sscanf(tok, "%d", &world[row][column]);
+			sscanf(tok, "%d", (int *)&world[row][column]);
 			
 			column++;
 			tok = strtok(NULL, ",");
@@ -314,7 +314,15 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	int y;
 
 	// Lade Grafik für die Blöcke
-	SDL_Surface *tmp = IMG_Load("resources/images/blocks.png");
+	SDL_Surface *tmp = IMG_Load("resources/images/blockset.png");
+	if (tmp == NULL)
+	{
+		printf("Surface nicht geladen!\n");
+		printf("%s\n", SDL_GetError());
+		exit(-1);
+	}
+	else
+		printf("Surface wurde geladen\n");
 	// skaliere Grafik
 	SDL_Surface *blockset = shrinkSurface(tmp, blockSize * BLOCK_SET_WIDTH, blockSize * BLOCK_SET_HEIGHT);
 	SDL_FreeSurface(tmp);
@@ -409,11 +417,11 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 
 				// Bewegung für alle Objekte
 				liste=objectList;
-				objectCollisionAndGravity( liste->object, &world);
+				objectCollisionAndGravity( liste->object, &world[0][0]);
 				while (liste->next != NULL)
 				{
 					liste=liste->next;
-					objectCollisionAndGravity( liste->object, &world);
+					objectCollisionAndGravity( liste->object, &world[0][0]);
 				}
 
 				// Spieler in vertikaler Richtung aus der Welt
