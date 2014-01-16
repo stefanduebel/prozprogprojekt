@@ -19,6 +19,7 @@
 
 #include "menu.h"
 #include "game.h"
+#include "highscore.h"
 
 #define FONT_SIZE 30
 
