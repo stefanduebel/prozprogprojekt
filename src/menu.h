@@ -3,8 +3,6 @@
 #define MAIN_H
 #endif
 
-
-
 /** Abstand zwischen den einzelnen Menüeinträgen */
 #define MENU_PADDING 20
 
@@ -29,6 +27,9 @@
 #define START_GAME 1
 #define HIGHSCORES 2
 
+/** Makro zum löschen des gesamten Bildschirminhaltes einer Surface
+ * @param surf Zeiger auf die SDL_Surface welche geleert werden soll
+ */
 #define CLEAR_SURFACE(surf) SDL_FillRect((surf), &(surf)->clip_rect, SDL_MapRGBA((surf)->format, 0, 0, 0, 0))
 
 /** Struktur für die animierten Wolken im Menühintergrund */
@@ -50,13 +51,16 @@ typedef struct menuItem
 	struct menuItem *next; /*!< Zeiger auf das nächste Menü-Item */
 } menuItem;
 
+/** Struktur für ein Menü.
+ * In einer solchen Struktur können Metadaten über eine Menü gespeichert werden und auf den ersten Menüeintrag gezeigt werden
+ */
 typedef struct menu
 {
-	unsigned int w;
-	unsigned int h;
-	unsigned int items;
-	int selected;
-	menuItem *next;
+	unsigned int w; /*!< Anzahl der nebeneinander liegenden Einträge */
+	unsigned int h; /*!< Anzahl der übereinander liegenden Einträge */
+	unsigned int items; /*!< Gesamtzahl der Einträge */
+	int selected; /*!< Index des derzeit ausgewählten Eintrags */
+	menuItem *next; /*!< Zeiger auf die Struktur des ersten Eintrages */
 } menu;
 
 /**
@@ -65,8 +69,9 @@ typedef struct menu
  * @param screen	Zeiger auf die SDL_Surface auf welche das Menü gezeichnet werden soll
  * @param font		Zeiger auf die TTF-Schriftart mit welcher die Menüeinträge geschrieben werden sollen
  * @param event	SDL_Event zur Erkennung von Tastatur- und Timer-Ereignissen
+ * @param res		Bildschirmauflösung
  *
- * @return 			ausgewählter Menüeintrag
+ * @return 			Index des ausgewählten Menüeintrags
  */
 int drawMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct resolution res);
 
@@ -78,23 +83,38 @@ void initializeClouds(void);
 /**
  * Initialisiert die verkettete Liste für das Hauptmenü
  *
- * @return Zeiger auf das erste Element der verketetten Liste der Menüeinträge
+ * @param res	Bildschirmauflösung
+ * @param font	Zeiger auf die TTF-Schriftart mit welcher das Menü angezeigt werden soll
+ *
+ * @return Zeiger auf das Menüelement
  */
 menu *initializeMainMenu(struct resolution res, TTF_Font *font);
 
 /**
- * Initialisiert die verkettete Liste für das Einstellungsmenü
+ * Initialisiert ein einfaches Listenmenü.
  *
- * @return Zeiger auf das erste Element der verketteten Liste der Menüeinträge
+ * Ein Listenmenü enthält keine Bilder sondern nur die untereinander stehenden Einträge. Diese werden zentriert bezogen zur übergebenen Auflösung angezeigt
+ *
+ * @param res			Bildschirmauflösung
+ * @param font			Zeiger auf die TTF-Schriftart mit welcher das Menü angezeigt werden soll
+ * @param itemNames	Namen der einzelnen Einträge
+ * @param items		Anzahl der Einträge
+ *
+ * @return Zeiger auf das Mneüelement
  */
-menu *initializeSettingsMenu(struct resolution res, TTF_Font *font);
-
 menu *initializeListMenu(struct resolution res, TTF_Font *font, char *itemNames[], unsigned char items);
 
 /**
- * Initialisiert die verkettete Liste für das Levelmenü
+ * Initialisiert die verkettete Liste für das Levelmenü.
  *
- * @return Zeiger auf das erste Element der verketteten Liste der Menüeinträge
+ * Bei diesem Menü wird für alle Leveldateien ein Menüeintrag angelegt.
+ * Diese Menüeinträge werden als Grid mit zugehörigen Thumbnails dargestellt, wenn kein zugehöriges Thumbnail verfügbar ist wird ein Standardbild genutzt.
+ * Außerdem wird aus jeder Leveldatei eine Beschreibung ausgelesen, welche unterhalb des Menüs angezeigt wird (werden soll)
+ *
+ * @param font	TTF-Schriftart mit welcher die Beschreibung angezeigt werden soll
+ * @param res	Bildschirmauflösung
+ *
+ * @return Zeiger auf das Menüelement
  */
 menu *initializeLevelMenu(TTF_Font *font, struct resolution res);
 
@@ -106,13 +126,13 @@ menu *initializeLevelMenu(TTF_Font *font, struct resolution res);
 void renderClouds(SDL_Surface *surface);
 
 /**
- * Rendert das Hauptmenü
+ * Rendert die übergebene Menüliste
  *
  * @param surface			Zeiger auf die SDL_Surface auf welche das Menü gerendert werden soll
- * @param change			Änderungen welche seit dem letzten Mal rendern ausgeführt wurden
- * @param menu				Zeiger auf das erste Element der Menüliste
+ * @param changeH			Änderung in horizontaler Richtung welche seit dem letzten Mal rendern ausgeführt wurd
+ * @param changeV			Änderung in vertikaler Richtung welche seit dem letzten Mal rendern ausgeführt wurde
+ * @param menu				Zeiger auf das Menüelement
  * @param descriptionY	Y-Position der Beschreibung des ausgewählten Menüeintrages, -1 falls dieser nicht angezeigt werden soll
- * @param layout			Layout des Menüs (liste oder grid)
  *
  * @return		Index des derzeit ausgewählten MenüEintrag
  */
@@ -127,15 +147,34 @@ int renderMenu(SDL_Surface *surface, int changeH, int changeV, menu *menu, int d
  * @param description			Text welcher in einer evtl. vorhandenen zustäzlichen Beschreibungsfläche angezeigt werden soll, wenn kein Text  angezeigt werden soll NULL
  * @param pathImageSelected	Pfad zur Bilddatei welche angezeigt werden soll wenn dieser Eintrag ausgewählt ist (PNG), wenn keine Grafik angezeigt werden soll NULL
  * @param pathImageUnselected	Pfad zur Bilddatei welche angezeigt werden soll wenn dieser Eintrag nicht ausgewählt ist (PNG), wenn keine Grafik angezeigt werden soll NULL
+ * @param font						TTF-Schriftart zum rendern der Texte
  *
  * @return Zeiger auf den erzeugten MenüEintrag, NULL wenn dieser nicht erzeugt werden konnte
  */
 menuItem *createItem (int x, int y, const char *text, const char *description, const char* pathImageSelected, const char* pathImageUnselected, TTF_Font *font);
 
+/**
+ * Erzeugt ein Menü
+ *
+ * @param w				Breite des Menüs (Anzahl der Einträge in horizontaler Richtung)
+ * @param h				Höhe des Menüs (Anzahl der Einträge in vertikaler Richtung)
+ * @param items		Anzahl der Menüeinträge
+ * @param firstItem	Zeiger auf das erste Menüelement
+ *
+ * @return	Zeiger auf das Menüelement
+ */
 menu *createMenu(unsigned int w, unsigned int h, unsigned int items, menuItem *firstItem);
 
 /**
  * gibt den von Menüeinträgen belegten Speicher wieder frei
+ *
+ * @param item	Zeiger auf das Menü welches gelöscht werden soll
  */
 void freeMenu(menu *item);
+
+/**
+ * Gibt den von einem Menüeintrag belegten Speicher wieder frei
+ *
+ * @param item	Zeiger auf den Menüeintrag
+ */
 void freeMenuItem(menuItem *item);
