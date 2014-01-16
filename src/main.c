@@ -45,9 +45,8 @@ Uint32 generate_userevent (Uint32 intervall, void *parameter)
 int main( int argc, char *argv[] )
 {
 	struct resolution res;
-
-	res.width = 1280;
-	res.height = 720;
+	res.width = 800;
+	res.height = 480;
 
 	// Load a font
 	TTF_Font *font;
@@ -109,36 +108,34 @@ int main( int argc, char *argv[] )
 
 	int channel;
  
-	channel = Mix_PlayChannel(-1, sound, -1);
-	if(channel == -1) {
-		fprintf(stderr, "Unable to play WAV file: %s\n", Mix_GetError());
-	}
+	//~ channel = Mix_PlayChannel(-1, sound, -1);
+	//~ if(channel == -1) {
+		//~ fprintf(stderr, "Unable to play WAV file: %s\n", Mix_GetError());
+	//~ }
 
 	while (1)
 	{
 		int levelNo;
-		switch (drawMenu(screen, font, event))
+		int returnValue = drawMenu(screen, font, event, res);
+		switch (returnValue)
 		{
-			case 0:
+			case START_GAME:
 				printf("Starte Spiel\n");
 				if(startGame (screen, event, res, 0))
 					printf("Verloren!\n");
 				break;
-			case 1:
+			case HIGHSCORES:
 				printf("Zeige Highscores\n");
 				break;
-			case 2:
-				levelNo = drawLevelMenu(screen, font, event);
-				if (levelNo != -1)
-					startGame(screen, event, res, levelNo);
-				break;
-			case 3:
-				drawSettingsMenu(screen, font, event, &res);
-				break;
 			default:
-				printf("Beende Spiel\n");
-				SDL_Quit();
-				exit(0);
+				if (returnValue >= 10 && returnValue <= 100)
+					startGame (screen, event, res, returnValue - 10);
+				else
+				{
+					printf("Beende Spiel\n");
+					SDL_Quit();
+					exit(returnValue);
+				}
 		}
 	}
 	
