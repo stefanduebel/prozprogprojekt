@@ -377,10 +377,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 		enemy->moveSpeed = 3;
 		enemy->frame     = 0;
 
-		// lade Grafik für den Spieler
-		SDL_Surface *tmp2 = IMG_Load("resources/images/player_final.png");
-		enemy->sprite = shrinkSurface(tmp2,  ((double) 36/48) * blockSize * 10, blockSize * 2);
-		SDL_FreeSurface(tmp2);
+		enemy->sprite = player.sprite;
 
 		objectAppend(&objectList, enemy);
 	}
