@@ -22,8 +22,12 @@ void append(struct highscoreItem **list, char name[], unsigned int points)
 	struct highscoreItem *listTemp = *list;
 
 	newElement = (struct highscoreItem*) malloc(sizeof(*newElement)); // erzeuge ein neues Element
-	strcpy(newElement->name,  name);
+
+	newElement->name = (char*) malloc(sizeof(name));
+	strcpy(newElement->name, name);
+
 	newElement->points = points;
+
 	newElement->next = NULL; // Wichtig für das Erkennen des Listenendes
 
 	if ( listTemp != NULL ) // sind Elemente vorhanden
@@ -66,7 +70,7 @@ struct highscoreItem *loadHighscore (void)
 			sscanf(tok, "%u", &tempPoints);
 
 			printf("Name: %s -> Points: %u\n",tempName, tempPoints);
-			//append(&highscoreList, tempName, tempPoints);
+			append(&highscoreList, tempName, tempPoints);
 		}
 		else
 		{break;}
