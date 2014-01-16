@@ -53,19 +53,25 @@ struct highscoreItem *loadHighscore (void)
 
 	char tempName[MAX];
 	unsigned int tempPoints;
-	struct highscoreItem *highscoreList;
+	struct highscoreItem *highscoreList = NULL;
 
-	getline (&line, &len, highscoreFile);
-	while(line)
+	while(1)
 	{
-		char *tok = strtok(line, ",");
-		strcpy(tempName, tok);
-		tok = strtok(NULL, ",");
-		sscanf(tok, "%u", &tempPoints);
-		printf("Name: %s -> Points: %u",tempName, tempPoints);
-		append(&highscoreList, tempName, tempPoints);
-		getline (&line, &len, highscoreFile);
+		if(getline (&line, &len, highscoreFile) != -1)
+		{
+			char *tok = strtok(line, ",");
+			strcpy(tempName, tok);
+
+			tok = strtok(NULL, ",");
+			sscanf(tok, "%u", &tempPoints);
+
+			printf("Name: %s -> Points: %u\n",tempName, tempPoints);
+			//append(&highscoreList, tempName, tempPoints);
+		}
+		else
+		{break;}
 	}
+
 	return highscoreList;
 }
 

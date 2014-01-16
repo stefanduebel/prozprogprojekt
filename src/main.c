@@ -45,6 +45,8 @@ Uint32 generate_userevent (Uint32 intervall, void *parameter)
 
 int main( int argc, char *argv[] )
 {
+	loadHighscore();
+
 	struct resolution res;
 
 	res.width = 1280;
