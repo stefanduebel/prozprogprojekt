@@ -44,12 +44,10 @@ Uint32 generate_userevent (Uint32 intervall, void *parameter)
 
 int main( int argc, char *argv[] )
 {
-	struct resolution res;
-	res.width = 800;
-	res.height = 480;
+	res.width = 1280;
+	res.height = 720;
 
 	// Load a font
-	TTF_Font *font;
 
 	if (TTF_Init() != 0)
 	{
@@ -115,8 +113,7 @@ int main( int argc, char *argv[] )
 
 	while (1)
 	{
-		int levelNo;
-		int returnValue = drawMenu(screen, font, event, res);
+		int returnValue = drawMenu(screen, event);
 		switch (returnValue)
 		{
 			case START_GAME:

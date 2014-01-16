@@ -15,7 +15,7 @@
 
 cloud clouds[CLOUDS];
 
-int drawMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct resolution res)
+int drawMenu(SDL_Surface *screen, SDL_Event event)
 {
 	initializeClouds();
 
@@ -24,8 +24,7 @@ int drawMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct resolu
 
 	menu *firstItem = NULL;
 
-	//~firstItem = initializeMainMenu(res, font);
-	firstItem = initializeListMenu(res, font, (char * []){"Spiel starten", "Highscores", "Level-Auswahl", "Einstellungen", "Beenden"}, 5);
+	firstItem = initializeListMenu((char * []){"Spiel starten", "Highscores", "Level-Auswahl", "Einstellungen", "Beenden"}, 5);
 
 	unsigned char menuType = MAIN_MENU;
 
@@ -109,14 +108,14 @@ int drawMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct resolu
 
 									case 2:
 										printf("Level-Auswahl\n");
-										firstItem = initializeLevelMenu(font, res);
+										firstItem = initializeLevelMenu();
 										selectedItem = renderMenu(menuSurface, 0, 0, firstItem, -1);
 										menuType = LEVEL_MENU;
 										break;
 
 									case 3:
 										printf("Einstellungs-Auswahl\n");
-										firstItem = initializeListMenu(res, font, (char * []){"HD-1080p", "HD-720p", "WGA", "VGA", "Fullscreen", "zurueck"}, 6);
+										firstItem = initializeListMenu((char * []){"HD-1080p", "HD-720p", "WGA", "VGA", "Fullscreen", "zurueck"}, 6);
 										selectedItem = renderMenu(menuSurface, 0, 0, firstItem, -1);
 										menuType = SETTINGS_MENU;
 										break;
@@ -150,7 +149,7 @@ int drawMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct resolu
 										return -1;
 
 									case 5:
-										firstItem = initializeListMenu(res, font, (char * []){"Spiel starten", "Highscores", "Level-Auswahl", "Einstellungen", "Beenden"}, 5);
+										firstItem = initializeListMenu((char * []){"Spiel starten", "Highscores", "Level-Auswahl", "Einstellungen", "Beenden"}, 5);
 										selectedItem = renderMenu(menuSurface, 0, 0, firstItem, -1);
 										menuType = MAIN_MENU;
 										break;
@@ -165,7 +164,7 @@ int drawMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct resolu
 					case SDLK_ESCAPE:
 						if (menuType == LEVEL_MENU || menuType == SETTINGS_MENU)
 						{
-							firstItem = initializeListMenu(res, font, (char * []){"Spiel starten", "Highscores", "Level-Auswahl", "Einstellungen", "Beenden"}, 5);
+							firstItem = initializeListMenu((char * []){"Spiel starten", "Highscores", "Level-Auswahl", "Einstellungen", "Beenden"}, 5);
 							selectedItem = renderMenu(menuSurface, 0, 0, firstItem, -1);
 							menuType = MAIN_MENU;
 						}
@@ -197,7 +196,7 @@ void initializeClouds(void)
 	}
 }
 
-menu *initializeLevelMenu(TTF_Font *font, struct resolution res)
+menu *initializeLevelMenu()
 {
 	/* ---- Menüeinträge erzeugen ---- */
 
@@ -258,7 +257,7 @@ menu *initializeLevelMenu(TTF_Font *font, struct resolution res)
 	return newMenu;
 }
 
-menu *initializeListMenu(struct resolution res, TTF_Font *font, char *itemNames[], unsigned char items)
+menu *initializeListMenu(char *itemNames[], unsigned char items)
 {
 	/* ---- Menüeinträge erzeugen ---- */
 

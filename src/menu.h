@@ -67,13 +67,11 @@ typedef struct menu
  * Erzeugt ein interaktives Menü und zeigt dieses an
  *
  * @param screen	Zeiger auf die SDL_Surface auf welche das Menü gezeichnet werden soll
- * @param font		Zeiger auf die TTF-Schriftart mit welcher die Menüeinträge geschrieben werden sollen
  * @param event	SDL_Event zur Erkennung von Tastatur- und Timer-Ereignissen
- * @param res		Bildschirmauflösung
  *
  * @return 			Index des ausgewählten Menüeintrags
  */
-int drawMenu(SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct resolution res);
+int drawMenu(SDL_Surface *screen, SDL_Event event);
 
 /**
  * Initialisiert das Wolkenarray welches im Hintergrund der verschiedenen Menüs angezeigt wird mit zufälligen Werten.
@@ -83,26 +81,21 @@ void initializeClouds(void);
 /**
  * Initialisiert die verkettete Liste für das Hauptmenü
  *
- * @param res	Bildschirmauflösung
- * @param font	Zeiger auf die TTF-Schriftart mit welcher das Menü angezeigt werden soll
- *
  * @return Zeiger auf das Menüelement
  */
-menu *initializeMainMenu(struct resolution res, TTF_Font *font);
+menu *initializeMainMenu();
 
 /**
  * Initialisiert ein einfaches Listenmenü.
  *
  * Ein Listenmenü enthält keine Bilder sondern nur die untereinander stehenden Einträge. Diese werden zentriert bezogen zur übergebenen Auflösung angezeigt
  *
- * @param res			Bildschirmauflösung
- * @param font			Zeiger auf die TTF-Schriftart mit welcher das Menü angezeigt werden soll
  * @param itemNames	Namen der einzelnen Einträge
  * @param items		Anzahl der Einträge
  *
  * @return Zeiger auf das Mneüelement
  */
-menu *initializeListMenu(struct resolution res, TTF_Font *font, char *itemNames[], unsigned char items);
+menu *initializeListMenu(char *itemNames[], unsigned char items);
 
 /**
  * Initialisiert die verkettete Liste für das Levelmenü.
@@ -111,12 +104,9 @@ menu *initializeListMenu(struct resolution res, TTF_Font *font, char *itemNames[
  * Diese Menüeinträge werden als Grid mit zugehörigen Thumbnails dargestellt, wenn kein zugehöriges Thumbnail verfügbar ist wird ein Standardbild genutzt.
  * Außerdem wird aus jeder Leveldatei eine Beschreibung ausgelesen, welche unterhalb des Menüs angezeigt wird (werden soll)
  *
- * @param font	TTF-Schriftart mit welcher die Beschreibung angezeigt werden soll
- * @param res	Bildschirmauflösung
- *
  * @return Zeiger auf das Menüelement
  */
-menu *initializeLevelMenu(TTF_Font *font, struct resolution res);
+menu *initializeLevelMenu();
 
 /**
  * Rendert den nächsten Animationsschritt für die Wolken
@@ -147,7 +137,6 @@ int renderMenu(SDL_Surface *surface, int changeH, int changeV, menu *menu, int d
  * @param description			Text welcher in einer evtl. vorhandenen zustäzlichen Beschreibungsfläche angezeigt werden soll, wenn kein Text  angezeigt werden soll NULL
  * @param pathImageSelected	Pfad zur Bilddatei welche angezeigt werden soll wenn dieser Eintrag ausgewählt ist (PNG), wenn keine Grafik angezeigt werden soll NULL
  * @param pathImageUnselected	Pfad zur Bilddatei welche angezeigt werden soll wenn dieser Eintrag nicht ausgewählt ist (PNG), wenn keine Grafik angezeigt werden soll NULL
- * @param font						TTF-Schriftart zum rendern der Texte
  *
  * @return Zeiger auf den erzeugten MenüEintrag, NULL wenn dieser nicht erzeugt werden konnte
  */
