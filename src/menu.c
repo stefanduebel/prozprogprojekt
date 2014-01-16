@@ -129,31 +129,34 @@ int drawMenu(SDL_Surface *screen, SDL_Event event)
 								switch (selectedItem)
 								{
 									case 0:
-										printf("1080p\n");
-										return -1;
+										setGraphicsMode(screen, 1920, 1080, 0);
+										printf("1080p (1920 x 1080)\n");
+										break;
 
 									case 1:
-										printf("720p\n");
-										return -1;
+										printf("720p (1280 x 720)\n");
+										setGraphicsMode(screen, 1280, 720, 0);
+										break;
 
 									case 2:
-										printf("WGA\n");
-										return -1;
+										setGraphicsMode(screen, 800, 480, 0);
+										printf("WGA (800 x 480)\n");
+										break;
 
 									case 3:
-										printf("VGA\n");
-										return -1;
+										setGraphicsMode(screen, 640, 480, 0);
+										printf("VGA (640 x 480)\n");
+										break;
 
 									case 4:
+										setGraphicsMode(screen, -1, -1, 1);
 										printf("Fullscreen\n");
-										return -1;
-
-									case 5:
-										firstItem = initializeListMenu((char * []){"Spiel starten", "Highscores", "Level-Auswahl", "Einstellungen", "Beenden"}, 5);
-										selectedItem = renderMenu(menuSurface, 0, 0, firstItem, -1);
-										menuType = MAIN_MENU;
 										break;
 								}
+
+								firstItem = initializeListMenu((char * []){"Spiel starten", "Highscores", "Level-Auswahl", "Einstellungen", "Beenden"}, 5);
+								selectedItem = renderMenu(menuSurface, 0, 0, firstItem, -1);
+								menuType = MAIN_MENU;
 								break;
 
 							case LEVEL_MENU:
@@ -429,4 +432,19 @@ void freeMenuItem(menuItem *item)
 		freeMenuItem(item->next);
 
 	free(item);
+}
+
+void setGraphicsMode(SDL_Surface *screen, int width, int height, char toggleFullscreen)
+{
+	if (width != -1 && height != -1)
+	{
+		res.height = height;
+		res.width = width;
+	}
+
+	int fullscreen = screen->flags & SDL_FULLSCREEN;
+	if ((fullscreen != 0 && toggleFullscreen == 0) || (fullscreen == 0 && toggleFullscreen != 0))
+		screen = SDL_SetVideoMode( res.width, res.height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
+	else
+		screen = SDL_SetVideoMode( res.width, res.height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF);
 }

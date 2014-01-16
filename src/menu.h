@@ -167,3 +167,5 @@ void freeMenu(menu *item);
  * @param item	Zeiger auf den Menüeintrag
  */
 void freeMenuItem(menuItem *item);
+
+void setGraphicsMode(SDL_Surface *screen, int height, int width, char toggleFullscreen);
