@@ -433,6 +433,10 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 					case 50:
 						world[playerBlockY][playerBlockX] = 255;
 						break;
+					case 53:
+						if(player.v > 0)
+						{world[playerBlockY][playerBlockX] = 54;}
+						break;
 					case 55:
 						return 0;
 						break;
