@@ -6,6 +6,8 @@ struct highscoreItem
 	struct highscoreItem *next;
 } highscoreItem;
 
+void append(struct highscoreItem **list, char name[], unsigned int points);
 void drawHighscore (SDL_Surface *screen, TTF_Font *font, SDL_Event event);
 struct highscoreItem *loadHighscore (void);
-struct highscoreItem *writeHighscore (void);
+void writeHighscore (struct highscoreItem *highscoreList);
+void insertHighscore (struct highscoreItem **highscoreList, char name[], unsigned int points);

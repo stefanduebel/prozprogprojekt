@@ -73,16 +73,77 @@ struct highscoreItem *loadHighscore (void)
 			append(&highscoreList, tempName, tempPoints);
 		}
 		else
-		{break;}
+		{
+			break;
+		}
 	}
-
+	fclose(highscoreFile);
 	return highscoreList;
 }
 
 // Funktion zum Schreiben in die Highscoreliste
-/* struct highscoreItem *writeHighscore (void)
+void writeHighscore (struct highscoreItem *highscoreList)
 {
-	printf("Name: \t");
-	fgets(name, MAX, stdin);
-	fflush(stdin);
-} */
+	FILE *highscoreFile = fopen (HIGHSCORE_PATH, "w");
+
+	do
+	{
+		fprintf(highscoreFile, "%s,%u\n", highscoreList->name, highscoreList->points);
+
+		highscoreList = highscoreList->next;
+	} while (highscoreList != NULL);
+
+	fclose(highscoreFile);
+}
+
+//Funktion zum Einfügen eines Elementes in die Liste
+void insertHighscore (struct highscoreItem **highscoreList, char name[], unsigned int points)
+{
+	struct highscoreItem *currentItem;
+	struct highscoreItem *newItem = (struct highscoreItem*) malloc(sizeof(struct highscoreItem));
+	if (newItem == NULL)
+	{
+		exit(-1);
+	}
+
+	currentItem = *highscoreList;
+
+	newItem->name = (char *) malloc(sizeof(name));
+	if (newItem->name == NULL)
+	{
+		exit(-1);
+	}
+	strcpy(newItem->name, name);
+	newItem->points = points;
+
+	if (newItem->points > currentItem->points)
+	{
+		newItem->next = *highscoreList;
+		*highscoreList = newItem;
+	}
+	else
+	{
+		while (1)
+		{
+			if (currentItem->next != NULL)
+			{
+				printf("1\n");
+				if (newItem->points > currentItem->next->points)
+				{
+					printf("2\n");
+					newItem->next = currentItem->next;
+					currentItem->next = newItem;
+					break;
+				}
+			}
+			else
+			{
+				printf("3\n");
+				currentItem->next = newItem;
+				newItem->next = NULL;
+				break;
+			}
+			currentItem = currentItem->next;
+		}
+	}
+}

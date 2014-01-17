@@ -45,12 +45,19 @@ Uint32 generate_userevent (Uint32 intervall, void *parameter)
 
 int main( int argc, char *argv[] )
 {
-	loadHighscore();
+	struct highscoreItem *highscore = loadHighscore();
+	printf("ersten Eintrag\n");
+	insertHighscore(&highscore, "Alice", 1000);
+	printf("zweiter Eintrag\n");
+	insertHighscore(&highscore, "Bob", 500);
+	printf("dritter Eintrag\n");
+	insertHighscore(&highscore, "Daniel2", 2);
+	writeHighscore(highscore);
 
 	struct resolution res;
 
-	res.width = 1280;
-	res.height = 720;
+	res.width = 640;
+	res.height = 480;
 
 	// Load a font
 	TTF_Font *font;
