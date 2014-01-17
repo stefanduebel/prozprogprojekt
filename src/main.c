@@ -125,8 +125,8 @@ int main( int argc, char *argv[] )
 				printf("Zeige Highscores\n");
 				break;
 			default:
-				if (returnValue >= 10 && returnValue <= 100)
-					startGame (screen, event, res, returnValue - 10);
+				if (returnValue >= LEVEL_OFFSET && returnValue < LEVEL_OFFSET + MAX_LEVEL)
+					startGame (screen, event, res, returnValue - LEVEL_OFFSET);
 				else
 				{
 					printf("Beende Spiel\n");

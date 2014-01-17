@@ -17,25 +17,28 @@ cloud clouds[CLOUDS];
 
 int drawMenu(SDL_Surface *screen, SDL_Event event)
 {
+	/* ---- initialisiere Wolken ---- */
 	initializeClouds();
 
+	/* ---- dekalriere und initialisiere Variablen ---- */
 	int changeV = 0, changeH = 0;
 	int selectedItem = 0;
 
+	/* ---- initialisiere das Hauptmenü ---- */
 	menu *firstItem = NULL;
-
 	firstItem = initializeListMenu((char * []){"Spiel starten", "Highscores", "Level-Auswahl", "Einstellungen", "Beenden"}, 5);
 
 	unsigned char menuType = MAIN_MENU;
 
-
-	if (firstItem == NULL)
-		return -3; // Fehler bei der initialisierung des Menüs
-
+	/* ---- initialisiere die Surface auf welcher sich das Menü befindet ---- */
 	SDL_Surface *menuSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, screen->clip_rect.w, screen->clip_rect.h, SCREEN_BPP, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+	if (menuSurface == NULL)
+		return FAILURE;
+
+	/* ---- rendere das Menü erstmals ---- */
 	selectedItem = renderMenu(menuSurface, 0, 0, firstItem);
 
-	// warte auf Events
+	/* ---- auf Events warten ---- */
 	while(SDL_WaitEvent (&event))
 	{
 		switch(event.type)
@@ -43,7 +46,7 @@ int drawMenu(SDL_Surface *screen, SDL_Event event)
 			// Quit-Event
 			case SDL_QUIT:
 			{
-				return -1;
+				return EXIT_GAME;
 				break;
 			}
 
@@ -99,7 +102,6 @@ int drawMenu(SDL_Surface *screen, SDL_Event event)
 								switch (selectedItem)
 								{
 									case 0:
-										printf("starte Spiel\n");
 										return START_GAME;
 
 									case 1:
@@ -107,21 +109,22 @@ int drawMenu(SDL_Surface *screen, SDL_Event event)
 										return HIGHSCORES;
 
 									case 2:
-										printf("Level-Auswahl\n");
 										firstItem = initializeLevelMenu();
 										selectedItem = renderMenu(menuSurface, 0, 0, firstItem);
 										menuType = LEVEL_MENU;
 										break;
 
 									case 3:
-										printf("Einstellungs-Auswahl\n");
 										firstItem = initializeListMenu((char * []){"HD-1080p", "HD-720p", "WGA", "VGA", "Fullscreen", "zurueck"}, 6);
 										selectedItem = renderMenu(menuSurface, 0, 0, firstItem);
 										menuType = SETTINGS_MENU;
 										break;
 
+									case 4:
+										return EXIT_GAME;
+
 									default:
-										return 0;
+										return FAILURE;
 								}
 								break;
 
@@ -130,27 +133,22 @@ int drawMenu(SDL_Surface *screen, SDL_Event event)
 								{
 									case 0:
 										setGraphicsMode(screen, 1920, 1080, 0);
-										printf("1080p (1920 x 1080)\n");
 										break;
 
 									case 1:
-										printf("720p (1280 x 720)\n");
 										setGraphicsMode(screen, 1280, 720, 0);
 										break;
 
 									case 2:
 										setGraphicsMode(screen, 800, 480, 0);
-										printf("WGA (800 x 480)\n");
 										break;
 
 									case 3:
 										setGraphicsMode(screen, 640, 480, 0);
-										printf("VGA (640 x 480)\n");
 										break;
 
 									case 4:
 										setGraphicsMode(screen, -1, -1, 1);
-										printf("Fullscreen\n");
 										break;
 								}
 
@@ -160,7 +158,7 @@ int drawMenu(SDL_Surface *screen, SDL_Event event)
 								break;
 
 							case LEVEL_MENU:
-								return selectedItem + 10;
+								return selectedItem + LEVEL_OFFSET;
 						}
 						break;
 
@@ -193,9 +191,10 @@ void initializeClouds(void)
 		clouds[i].velocity = (double) (i%4 + 1) / 32;
 		clouds[i].height = (i * 4);
 		clouds[i].position = i%5 * 10;
-		SDL_Surface *tmp = IMG_Load("resources/images/cloud.png");
-		clouds[i].surface = shrinkSurface(tmp, 3*48, 48); // TODO: richtige Größe
-		SDL_FreeSurface(tmp);
+		//~SDL_Surface *tmp = IMG_Load("resources/images/cloud1.png");
+		//~clouds[i].surface = shrinkSurface(tmp, 2*48, 48); // TODO: richtige Größe
+		clouds[i].surface = IMG_Load("resources/images/cloud1.png");
+		//~SDL_FreeSurface(tmp);
 	}
 }
 
@@ -229,31 +228,30 @@ menu *initializeLevelMenu()
 			lastItemGenerated->description[strlen(lastItemGenerated->description)-1] = '\0';
 
 		/* ---- nutze Thumbnails wenn vorhanden ---- */
-		// TODO: PNGs laden
 		sprintf(filepath, "resources/images/thumbnails/level%dSelected.png", items);
 		lastItemGenerated->selected = IMG_Load(filepath);
 		sprintf(filepath, "resources/images/thumbnails/level%dUnselected.png", items);
 		lastItemGenerated->unselected = IMG_Load(filepath);
 
 		if (lastItemGenerated->selected == NULL)
-			lastItemGenerated->selected = SDL_LoadBMP(MENU_BACKGROUND_SELECTED);
+			lastItemGenerated->selected = IMG_Load(MENU_BACKGROUND_SELECTED);
 		if (lastItemGenerated->unselected == NULL)
-			lastItemGenerated->unselected = SDL_LoadBMP(MENU_BACKGROUND);
+			lastItemGenerated->unselected = IMG_Load(MENU_BACKGROUND);
 
 		items++;
 	}
 
 	/* ---- Gesamtabmessunge des Menüs (füllt immer die Zeilen aus) ---- */
-	unsigned int itemsPerRow = (res.width - (4 * MENU_PADDING)) / (48 + MENU_PADDING);
-	unsigned int menuWidth = (itemsPerRow * 48) + ((itemsPerRow-1)* MENU_PADDING);
-	unsigned int menuHeight = (((items / itemsPerRow) + 1) * 48) + ((items / itemsPerRow) * MENU_PADDING);
+	unsigned int itemsPerRow = (res.width - (4 * MENU_PADDING)) / (lastItemGenerated->unselected->clip_rect.w + MENU_PADDING);
+	unsigned int menuWidth = (itemsPerRow * lastItemGenerated->unselected->clip_rect.w) + ((itemsPerRow-1)* MENU_PADDING);
+	unsigned int menuHeight = (((items / itemsPerRow) + 1) * lastItemGenerated->unselected->clip_rect.h) + ((items / itemsPerRow) * MENU_PADDING);
 
 	/* ---- Positionen bestimmen ---- */
 	lastItemGenerated = firstItem;
 	for (int i = 0; i < items; i++)
 	{
-		lastItemGenerated->position.x = ((res.width - menuWidth) / 2) + ((i%itemsPerRow) * (48 + MENU_PADDING));
-		lastItemGenerated->position.y = ((res.height - menuHeight) / 2) + ((i/itemsPerRow) * (48 + MENU_PADDING));
+		lastItemGenerated->position.x = ((res.width - menuWidth) / 2) + ((i%itemsPerRow) * (lastItemGenerated->unselected->clip_rect.w + MENU_PADDING));
+		lastItemGenerated->position.y = ((res.height - menuHeight) / 2) + ((i/itemsPerRow) * (lastItemGenerated->unselected->clip_rect.h + MENU_PADDING));
 		lastItemGenerated = lastItemGenerated->next;
 	}
 
@@ -354,13 +352,10 @@ int renderMenu(SDL_Surface *surface, int changeH, int changeV, menu *menu)
 			menu->selected = menu->items-1;
 	}
 
-	printf("rendere Menü\n");
-	
 	/* ---- Einträge rendern ---- */
 	// TODO: wenn Beschreibung: diese auch rendern
 	menuItem *item = menu->next;
 	int i = 0;
-	printf("surface: BPP: %u, amask: %u\n", surface->format->BitsPerPixel, surface->format->Amask);
 	do
 	{
 		/* ---- zeichne Thumbnail ---- */
@@ -370,7 +365,6 @@ int renderMenu(SDL_Surface *surface, int changeH, int changeV, menu *menu)
 		}
 		else
 		{
-			printf("item: BPP: %u, amask: %u\n", item->unselected->format->BitsPerPixel, item->unselected->format->Amask);
 			SDL_BlitSurface(item->unselected, NULL, surface, &item->position);
 		}
 
@@ -396,12 +390,12 @@ menuItem *createItem (const char *text)
 	if (!item)
 	{
 		printf("keinen Speicher bekommen!\n");
-		exit(-1);
+		exit(FAILURE);
 	}
 
 	if (text != NULL)
 	{
-		SDL_Color color[2] = {{100,100,100,0},{255,255,255,0}};
+		SDL_Color color[2] = {{255,255,255,0},{100,100,100,0}};
 		item->selected = TTF_RenderText_Solid(font, text, color[1]);
 		item->unselected = TTF_RenderText_Solid(font, text, color[0]);
 	}
@@ -417,7 +411,7 @@ menu *createMenu(unsigned int w, unsigned int h, unsigned int items, menuItem *f
 {
 	menu *newMenu = (menu *) malloc(sizeof(menu));
 	if (!newMenu)
-		return NULL;
+		exit(FAILURE);
 	newMenu->w = w;
 	newMenu->h = h;
 	newMenu->items = items;
@@ -440,6 +434,9 @@ void freeMenuItem(menuItem *item)
 	if (!item->next)
 		freeMenuItem(item->next);
 
+	SDL_FreeSurface(item->selected);
+	SDL_FreeSurface(item->unselected);
+	free(item->description);
 	free(item);
 }
 
