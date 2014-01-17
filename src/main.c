@@ -91,21 +91,21 @@ int main( int argc, char *argv[] )
 	Uint16 audioFormat = AUDIO_S16SYS;
 	int audioChannels = 2;
 	int audioBuffers = 4096;
- 
+
 	if(Mix_OpenAudio(audioRate, audioFormat, audioChannels, audioBuffers) != 0) {
 		fprintf(stderr, "Unable to initialize audio: %s\n", Mix_GetError());
 		exit(1);
 	}
 
 	Mix_Chunk *sound = NULL;
- 
+
 	sound = Mix_LoadWAV("resources/jeopardy.wav");
 	if(sound == NULL) {
 		fprintf(stderr, "Unable to load WAV file: %s\n", Mix_GetError());
 	}
 
 	int channel;
- 
+
 	//~ channel = Mix_PlayChannel(-1, sound, -1);
 	//~ if(channel == -1) {
 		//~ fprintf(stderr, "Unable to play WAV file: %s\n", Mix_GetError());
@@ -118,8 +118,18 @@ int main( int argc, char *argv[] )
 		{
 			case START_GAME:
 				printf("Starte Spiel\n");
-				if(startGame (screen, event, res, 0))
+
+				int exitCode;
+				exitCode = startGame (screen, event, res, 0);
+				if(exitCode < 0)
+				{
 					printf("Verloren!\n");
+				}
+				else if(exitCode > 0)
+				{
+					printf("Deine Punktzahl: %d\n", exitCode);
+				}
+
 				break;
 			case HIGHSCORES:
 				printf("Zeige Highscores\n");

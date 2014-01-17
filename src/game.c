@@ -47,7 +47,7 @@ int worldSizeY;
 int blockSize;
 double a;
 struct {int x;} camPosition;
-unsigned int score;
+int score;
 
 void blockDraw(SDL_Surface *screen, SDL_Surface *bitmap, int x, int y, int blocktype)
 {
@@ -259,8 +259,7 @@ void objectCollisionAndGravity(struct object *object, unsigned char *world)
 
 int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int level)
 {
-	int quit = 0;
-
+	score = 0;
 
 	// ============================== HINTERGRUND ==============================
 	Uint32 color = SDL_MapRGB( screen->format, 208, 244, 247 );
@@ -399,7 +398,9 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 			// Quit-Event: quit-Flag setzen
 			case SDL_QUIT:
 			{
-				quit = 1;
+				printf("Beende Spiel\n");
+				SDL_Quit();
+				exit(0);
 				break;
 			}
 
@@ -426,7 +427,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 
 				// Spieler in vertikaler Richtung aus der Welt
 				if(player.posY < 0-blockSize || player.posY > worldSizeY*blockSize)
-				{return 1;}
+				{return -1;}
 
 				// Blocklogik
 				playerBlockX = (player.posX + player.sizeX / 2) / blockSize;
@@ -436,7 +437,21 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 					// Goldene Münze
 					case 50:
 						world[playerBlockY][playerBlockX] = 255;
-						score++;
+						score += 3;
+						printf("Score: %u\n", score);
+						break;
+
+					// Silberne Münze
+					case 51:
+						world[playerBlockY][playerBlockX] = 255;
+						score += 2;
+						printf("Score: %u\n", score);
+						break;
+
+					// Bronzefarbene Münze
+					case 52:
+						world[playerBlockY][playerBlockX] = 255;
+						score += 1;
 						printf("Score: %u\n", score);
 						break;
 
@@ -448,7 +463,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 
 					// Levelausgang
 					case 55:
-						return 0;
+						return score;
 						break;
 
 					// Sprungfeder (Oben)
@@ -583,7 +598,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 
 					// Escape
 					case SDLK_ESCAPE:
-						quit = 1;
+						return 0;
 						break;
 					// alles andere ignorieren
 					default:
@@ -608,10 +623,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				break;
 			}
 		}
-
-		// wenn das quit-Flag gesetzt ist beenden
-		if(quit){return 0;}
 	}
 
-	return 1;
+	return 0;
 }
