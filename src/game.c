@@ -110,6 +110,30 @@ void objectAppend(struct objectListElement **lst, struct object *object)
 	}
 }
 
+
+void objectDelete(struct objectListElement **list, struct objectListElement *deleteElement)
+{
+	struct objectListElement *prevElement = *list;
+	struct objectListElement *nextElement;
+
+	if(prevElement == deleteElement)
+	{
+		nextElement = deleteElement->next;
+		free(deleteElement);
+		*list = nextElement;
+	}
+	else
+	{
+		while(prevElement->next != deleteElement)
+		{
+			prevElement = prevElement->next;
+		}
+		prevElement->next = deleteElement->next;
+		free(deleteElement);
+	}
+}
+
+
 void objectDraw(SDL_Surface *screen, struct object *object)
 {
 	if(object->moveSpeed && object->v == 0)
@@ -480,11 +504,9 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				}
 
 				// Kollision zwischen Spieler und Objekten
-				liste=objectList;
-				while (liste->next != NULL)
+				liste=objectList->next;
+				while (liste != NULL)
 				{
-					liste=liste->next;
-
 					hitbox = objectCollisionToObject(&player, liste->object);
 
 					if(hitbox) 
@@ -492,13 +514,20 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 						if((hitbox == 4 || hitbox == 8 || hitbox == 12) && player.v != 0)
 						{
 							player.v = -9 * ((double) blockSize / 48);
-							printf("Gegner besiegt!!\n");
+
+							struct objectListElement *tmp = liste->next;
+							printf("Gegner %p besiegt!!\n", liste->object);
+							objectDelete(&objectList, &liste->object);
+							liste = tmp;
 						}
 						else
 						{
-							liste->object->moveDir = -liste->object->moveDir;
-							printf("Verloren!!\n");
+							return -1;
 						}
+					}
+					else
+					{
+						liste=liste->next;
 					}
 				}
 
