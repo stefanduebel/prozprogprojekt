@@ -30,7 +30,7 @@
 /** Makro zum löschen des gesamten Bildschirminhaltes einer Surface
  * @param surf Zeiger auf die SDL_Surface welche geleert werden soll
  */
-#define CLEAR_SURFACE(surf) SDL_FillRect((surf), &(surf)->clip_rect, SDL_MapRGBA((surf)->format, 0, 0, 0, 0))
+#define CLEAR_SURFACE(surf) SDL_FillRect((surf), &(surf)->clip_rect, SDL_MapRGBA((surf)->format, 208, 244 , 247, 0))
 
 /** Struktur für die animierten Wolken im Menühintergrund */
 typedef struct cloud
@@ -126,21 +126,16 @@ void renderClouds(SDL_Surface *surface);
  *
  * @return		Index des derzeit ausgewählten MenüEintrag
  */
-int renderMenu(SDL_Surface *surface, int changeH, int changeV, menu *menu, int descriptionY);
+int renderMenu(SDL_Surface *surface, int changeH, int changeV, menu *menu);
 
 /**
  * Erzeugt ein Menüeintrag
  *
- * @param x 						X-Koordinate auf dem Bildschirm
- * @param y 						Y-Koordinate auf dem Bildschirm
  * @param text 					Text welcher innerhalb des Menüitems zentriert angezeigt werden soll, wenn kein Text angezeigt werden soll NULL
- * @param description			Text welcher in einer evtl. vorhandenen zustäzlichen Beschreibungsfläche angezeigt werden soll, wenn kein Text  angezeigt werden soll NULL
- * @param pathImageSelected	Pfad zur Bilddatei welche angezeigt werden soll wenn dieser Eintrag ausgewählt ist (PNG), wenn keine Grafik angezeigt werden soll NULL
- * @param pathImageUnselected	Pfad zur Bilddatei welche angezeigt werden soll wenn dieser Eintrag nicht ausgewählt ist (PNG), wenn keine Grafik angezeigt werden soll NULL
  *
  * @return Zeiger auf den erzeugten MenüEintrag, NULL wenn dieser nicht erzeugt werden konnte
  */
-menuItem *createItem (int x, int y, const char *text, const char *description, const char* pathImageSelected, const char* pathImageUnselected, TTF_Font *font);
+menuItem *createItem (const char *text);
 
 /**
  * Erzeugt ein Menü
@@ -168,4 +163,12 @@ void freeMenu(menu *item);
  */
 void freeMenuItem(menuItem *item);
 
+/**
+ * Ändert Auflösung und Vollbild
+ *
+ * @param screen				Zeiger auf die Bildschirm-Surface
+ * @param height				gewünschte Bildschirmhöhe, -1 wenn die Auflösung nicht geändert werden soll
+ * @param width				gewünschte Bildschirmbreite, -1 wenn die Auflösung nicht geändert werden soll
+ * @param toggleFullscreen	schaltet den Vollbildmodus um wenn ungleich 0
+ */
 void setGraphicsMode(SDL_Surface *screen, int height, int width, char toggleFullscreen);
