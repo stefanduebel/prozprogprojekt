@@ -80,9 +80,16 @@ int main( int argc, char *argv[] )
 	// Event-System initialisieren
 	SDL_Event event;
 
+	SDL_WM_SetCaption("Jump and Run", "Jump and Run");
+	SDL_Surface *icon = IMG_Load("resources/images/icon.png");
+	if (icon != NULL)
+		SDL_WM_SetIcon(icon, NULL);
+
 	// Erstelle die Bildschirmfläche
 	SDL_Surface *screen = NULL;
 	screen = SDL_SetVideoMode( res.width, res.height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF);
+
+	
 
 	SDL_ShowCursor(0);
 
