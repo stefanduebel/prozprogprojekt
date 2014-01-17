@@ -47,7 +47,7 @@ int worldSizeY;
 int blockSize;
 double a;
 struct {int x;} camPosition;
-
+unsigned int score;
 
 void blockDraw(SDL_Surface *screen, SDL_Surface *bitmap, int x, int y, int blocktype)
 {
@@ -109,7 +109,6 @@ void objectAppend(struct objectListElement **lst, struct object *object)
 		*lst=newElement;
 	}
 }
-
 
 void objectDraw(SDL_Surface *screen, struct object *object)
 {
@@ -207,28 +206,32 @@ unsigned char objectCollisionToObject(struct object *object1, struct object *obj
 {
 	unsigned char hitbox = 0;
 
-	if( object1->posX                  >= object2->posX                  &&
-	    object1->posX                  <= object2->posX + object2->sizeX &&
-	    object1->posY                  >= object2->posY                  &&
-	    object1->posY                  <= object2->posY + object2->sizeY    )
+	// Oben-Links
+	if( object1->posX                  +1 >= object2->posX                  &&
+	    object1->posX                  +1 <= object2->posX + object2->sizeX &&
+	    object1->posY                  +1 >= object2->posY                  &&
+	    object1->posY                  +1 <= object2->posY + object2->sizeY    )
 	{hitbox += 1;}
 
-	if( object1->posX + object1->sizeX >= object2->posX                  &&
-	    object1->posX + object1->sizeX <= object2->posX + object2->sizeX &&
-	    object1->posY                  >= object2->posY                  &&
-	    object1->posY                  <= object2->posY + object2->sizeY    )
+	// Oben-Rechts
+	if( object1->posX + object1->sizeX -1 >= object2->posX                  &&
+	    object1->posX + object1->sizeX -1 <= object2->posX + object2->sizeX &&
+	    object1->posY                  +1 >= object2->posY                  &&
+	    object1->posY                  +1 <= object2->posY + object2->sizeY    )
 	{hitbox += 2;}
 
-	if( object1->posX                  >= object2->posX                  &&
-	    object1->posX                  <= object2->posX + object2->sizeX &&
-	    object1->posY + object1->sizeY >= object2->posY                  &&
-	    object1->posY + object1->sizeY <= object2->posY + object2->sizeY    )
+	// Unten-Links
+	if( object1->posX                  +1 >= object2->posX                  &&
+	    object1->posX                  +1 <= object2->posX + object2->sizeX &&
+	    object1->posY + object1->sizeY -1 >= object2->posY                  &&
+	    object1->posY + object1->sizeY -1 <= object2->posY + object2->sizeY    )
 	{hitbox += 4;}
 
-	if( object1->posX + object1->sizeX >= object2->posX                  &&
-	    object1->posX + object1->sizeX <= object2->posX + object2->sizeX &&
-	    object1->posY + object1->sizeY >= object2->posY                  &&
-	    object1->posY + object1->sizeY <= object2->posY + object2->sizeY    )
+	// Unten-Rechts
+	if( object1->posX + object1->sizeX -1 >= object2->posX                  &&
+	    object1->posX + object1->sizeX -1 <= object2->posX + object2->sizeX &&
+	    object1->posY + object1->sizeY -1 >= object2->posY                  &&
+	    object1->posY + object1->sizeY -1 <= object2->posY + object2->sizeY    )
 	{hitbox += 8;}
 
 	return hitbox;
@@ -363,7 +366,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	struct object *enemy;
 
 	int counter = 0;
-	for(counter = 0; counter < 50; counter++)
+	for(counter = 0; counter < 1; counter++)
 	{
 		enemy = (struct object*) malloc(sizeof(*enemy));
 
@@ -430,15 +433,34 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				playerBlockY = (player.posY + player.sizeY / 2) / blockSize;
 				switch(world[playerBlockY][playerBlockX])
 				{
+					// Goldene Münze
 					case 50:
 						world[playerBlockY][playerBlockX] = 255;
+						score++;
+						printf("Score: %u\n", score);
 						break;
+
+					// Roter Schalter
 					case 53:
 						if(player.v > 0)
 						{world[playerBlockY][playerBlockX] = 54;}
 						break;
+
+					// Levelausgang
 					case 55:
 						return 0;
+						break;
+
+					// Sprungfeder (Oben)
+					case 56:
+						if(player.v > 0)
+						{world[playerBlockY][playerBlockX] = 57;}
+						break;
+
+					// Sprungfeder (Unten)
+					case 57:
+						player.v = 2 * -9 * ((double) blockSize / 48);
+						world[playerBlockY][playerBlockX] = 56;
 						break;
 				}
 
@@ -452,7 +474,16 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 
 					if(hitbox) 
 					{
-						liste->object->moveDir = -liste->object->moveDir;
+						if((hitbox == 4 || hitbox == 8 || hitbox == 12) && player.v != 0)
+						{
+							player.v = -9 * ((double) blockSize / 48);
+							printf("Gegner besiegt!!\n");
+						}
+						else
+						{
+							liste->object->moveDir = -liste->object->moveDir;
+							printf("Verloren!!\n");
+						}
 					}
 				}
 
