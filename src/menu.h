@@ -41,7 +41,7 @@
 typedef struct cloud
 {
 	double velocity; /*!< Geschwindigkeit der Wolke */
-	unsigned short height; /*!< Höhe der Wolke (relative x-Position)*/
+	double height; /*!< Höhe der Wolke (relative x-Position)*/
 	double position; /*!< derzeitige Y-Postion der Wolke */
 	SDL_Surface *surface; /*!< Zeiger auf die Surface der Wolke */
 } cloud;

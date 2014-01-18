@@ -10,6 +10,7 @@
 #include <SDL/SDL_ttf.h>
 #include <SDL/SDL_image.h>
 #include <string.h>
+#include <time.h>
 #include "menu.h"
 #include "image.h"
 
@@ -184,17 +185,15 @@ int drawMenu(SDL_Surface *screen, SDL_Event event)
 
 void initializeClouds(void)
 {
+	srand(time(NULL));
 	for (int i = 0; i < CLOUDS; i++)
 	{
 		// initialisiere die einzelnen Wolken
-		// TODO: randomize
-		clouds[i].velocity = (double) (i%4 + 1) / 32;
-		clouds[i].height = (i * 4);
-		clouds[i].position = i%5 * 10;
-		//~SDL_Surface *tmp = IMG_Load("resources/images/cloud1.png");
-		//~clouds[i].surface = shrinkSurface(tmp, 2*48, 48); // TODO: richtige Größe
 		clouds[i].surface = IMG_Load("resources/images/cloud1.png");
-		//~SDL_FreeSurface(tmp);
+		clouds[i].velocity = (double) (rand() % 20 + 30) / 500 / 100;
+		clouds[i].height = (double)(rand() % 40) / 100;
+		clouds[i].position = ((double)(rand() % 100)) / 100;
+		
 	}
 }
 
@@ -302,17 +301,16 @@ void renderClouds(SDL_Surface *surface)
 	{
 		// bestimme die absolute Position am Himmel as den relativen Positionen der Wolke
 		SDL_Rect offset;
-		offset.x = clouds[i].position * surface->clip_rect.w / 100;
-		offset.y = clouds[i].height * surface->clip_rect.h / 100;
+		offset.x = clouds[i].position * surface->clip_rect.w;
+		offset.y = clouds[i].height * surface->clip_rect.h;
 
 		SDL_BlitSurface(clouds[i].surface, NULL, surface, &offset);
 
 		// Wolke weiterziehen lassen
 		clouds[i].position += clouds[i].velocity;
-		if (clouds[i].position > 100)
+		if (clouds[i].position > 1)
 		{
-			// TODO: neue Zufallswerte bestimmen 
-			clouds[i].position = 0 - ((double) surface->clip_rect.w / clouds[i].surface->clip_rect.w) - 10;
+			clouds[i].position = 0 - (((double) clouds[i].surface->clip_rect.w) / surface->clip_rect.w);
 		}
 	}
 }
