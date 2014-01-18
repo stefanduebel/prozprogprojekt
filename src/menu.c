@@ -189,7 +189,10 @@ void initializeClouds(void)
 	for (int i = 0; i < CLOUDS; i++)
 	{
 		// initialisiere die einzelnen Wolken
-		clouds[i].surface = IMG_Load("resources/images/cloud1.png");
+		char cloudNumber = rand() % 3;
+		char filepath[28];
+		sprintf(filepath, "resources/images/cloud%d.png", cloudNumber);
+		clouds[i].surface = IMG_Load(filepath);
 		clouds[i].velocity = (double) (rand() % 20 + 30) / 500 / 100;
 		clouds[i].height = (double)(rand() % 40) / 100;
 		clouds[i].position = ((double)(rand() % 100)) / 100;
