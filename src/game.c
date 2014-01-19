@@ -87,6 +87,30 @@ unsigned char blockGet(unsigned char *world, int x, int y)
 }
 
 
+/*void triggerAppend(struct objectListElement **lst, struct object *object)
+{
+	struct objectListElement *newElement;
+	struct objectListElement *lst_iter = *lst;
+
+	newElement = (struct objectListElement*) malloc(sizeof(*newElement)); // erzeuge ein neues Element
+	newElement->object = object;
+	newElement->next = NULL; // Wichtig für das Erkennen des Listenendes
+
+	if ( lst_iter != NULL )// sind Elemente vorhanden
+	{
+		while (lst_iter->next != NULL ) // suche das letzte Element
+		{
+			lst_iter=lst_iter->next;
+		}
+		lst_iter->next=newElement; // Hänge das Element hinten an
+	}
+	else // wenn die liste leer ist, bin ich das erste Element
+	{
+		*lst=newElement;
+	}
+}*/
+
+
 void objectAppend(struct objectListElement **lst, struct object *object)
 {
 	struct objectListElement *newElement;
@@ -283,13 +307,7 @@ void objectCollisionAndGravity(struct object *object, unsigned char *world)
 
 int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int level)
 {
-	score = 0;
-
-	// ============================== HINTERGRUND ==============================
-	Uint32 color = SDL_MapRGB( screen->format, 208, 244, 247 );
-
-
-	// ============================== WELT ==============================
+	// ============================== LEVEL-DATEI ==============================
 	char filepath[50];
 	sprintf(filepath, "resources/maps/level%d.map", level);
 	FILE *worldFile = fopen(filepath, "r");
@@ -297,13 +315,22 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 		return -1;
 	char *line = NULL;
 	size_t len = 0;
+	char *tok = NULL;
 
-	// erste Zeile verwerfen
+
+	// ============================== HINTERGRUND ==============================
+	Uint32 color = SDL_MapRGB( screen->format, 208, 244, 247 );
+
+
+	// ============================== WELT ==============================
+	// LEVEL-Block suchen
+	do
+	{getline(&line, &len, worldFile);}
+	while(strcmp(line, "==LEVEL==\n") != 0);
+
+	// erste Zeile: Größe des Levels
 	getline(&line, &len, worldFile);
-	line = NULL;
-	//zweite Zeile: Größe des Levels
-	getline(&line, &len, worldFile);
-	char *tok = strtok(line, ",");
+	tok = strtok(line, ",");
 	sscanf(tok, "%d", &worldSizeY);
 	tok = strtok(NULL, ",");
 	sscanf(tok, "%d", &worldSizeX);
@@ -378,24 +405,47 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	player.sprite = shrinkSurface(tmp1, (int)((double) 36/48 * blockSize * 10), blockSize*2);
 	SDL_FreeSurface(tmp1);
 
+	// ===== Position aus Leveldatei laden =====
+	// PLAYER-Block suchen
+	do
+	{getline(&line, &len, worldFile);}
+	while(strcmp(line, "==PLAYER==\n") != 0);
+
+	// erste Zeile: Position des Spielers
+	getline(&line, &len, worldFile);
+
+	tok = strtok(line, ",");
+	sscanf(tok, "%d", &player.posX);
+	player.posX *= blockSize;
+
+	tok = strtok(NULL, ",");
+	sscanf(tok, "%d", &player.posY);
+	player.posY *= blockSize;
+
 	objectAppend(&objectList, &player);
 
 	short playMoveLeft = 0;
 	short playMoveRight = 0;
 	unsigned int playerBlockX = 0;
 	unsigned int playerBlockY = 0;
+	unsigned char hitbox = 0;
+
 
 	// ============================== GEGNER ==============================
 	struct object *enemy;
 
-	int counter = 0;
-	for(counter = 0; counter < 1; counter++)
+
+	// ENEMYS-Block suchen
+	do
+	{getline(&line, &len, worldFile);}
+	while(strcmp(line, "==ENEMYS==\n") != 0);
+
+	getline(&line, &len, worldFile);
+	while(strcmp(line, "\n") != 0)
 	{
 		enemy = (struct object*) malloc(sizeof(*enemy));
 
 		enemy->type      = 1;
-		enemy->posX      = blockSize * (counter + 2);
-		enemy->posY      = 0;
 		enemy->sizeX     = (int) ((double) 36 / 48 * blockSize);
 		enemy->sizeY     = blockSize;
 		enemy->v         = 0;
@@ -405,15 +455,37 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 
 		enemy->sprite = player.sprite;
 
-		objectAppend(&objectList, enemy);
-	}
+		// Zeile: Position des Gegners
+		tok = strtok(line, ",");
+		sscanf(tok, "%d", &enemy->posX);
+		enemy->posX *= blockSize;
 
+		tok = strtok(NULL, ",");
+		sscanf(tok, "%d", &enemy->posY);
+		enemy->posY *= blockSize;
+
+		objectAppend(&objectList, enemy);
+
+		getline(&line, &len, worldFile);
+	}
 
 	// ============================== KAMERA ==============================
 	// Variable ist Global
 	camPosition.x = 0;
 
-	unsigned char hitbox;
+
+	// ============================== PUNKTE ==============================
+	score = 0;
+	int scoreRender = 0;
+
+	SDL_Color scoreColor = {100,100,100,0};
+	char scoreString[7];
+	SDL_Surface *scoreText;
+	SDL_Rect scorePosition;
+	scorePosition.y = blockSize/2;
+	scorePosition.x = blockSize/2;
+
+
 	// Main-Loop
 	while(SDL_WaitEvent (&event))
 	{
@@ -454,6 +526,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				{return -1;}
 
 				// Blocklogik
+				// Körpermitte
 				playerBlockX = (player.posX + player.sizeX / 2) / blockSize;
 				playerBlockY = (player.posY + player.sizeY / 2) / blockSize;
 				switch(world[playerBlockY][playerBlockX])
@@ -461,28 +534,28 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 					// Goldene Münze
 					case 50:
 						world[playerBlockY][playerBlockX] = 255;
-						score += 3;
-						printf("Score: %u\n", score);
+						score += 50;
 						break;
 
 					// Silberne Münze
 					case 51:
 						world[playerBlockY][playerBlockX] = 255;
-						score += 2;
-						printf("Score: %u\n", score);
+						score += 30;
 						break;
 
 					// Bronzefarbene Münze
 					case 52:
 						world[playerBlockY][playerBlockX] = 255;
-						score += 1;
-						printf("Score: %u\n", score);
+						score += 15;
 						break;
 
 					// Roter Schalter
 					case 53:
 						if(player.v > 0)
-						{world[playerBlockY][playerBlockX] = 54;}
+						{
+							world[playerBlockY][playerBlockX] = 54;
+							score += 10;
+						}
 						break;
 
 					// Levelausgang
@@ -490,16 +563,22 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 						return score;
 						break;
 
-					// Sprungfeder (Oben)
-					case 56:
-						if(player.v > 0)
-						{world[playerBlockY][playerBlockX] = 57;}
-						break;
-
 					// Sprungfeder (Unten)
 					case 57:
 						player.v = 2 * -9 * ((double) blockSize / 48);
 						world[playerBlockY][playerBlockX] = 56;
+						break;
+				}
+
+				// Füße
+				playerBlockX = (player.posX + player.sizeX / 2) / blockSize;
+				playerBlockY = (player.posY + player.sizeY - 1)    / blockSize;
+				switch(world[playerBlockY][playerBlockX])
+				{ 
+					// Sprungfeder (Oben)
+					case 56:
+						if(player.v > 0)
+						{world[playerBlockY][playerBlockX] = 57;}
 						break;
 				}
 
@@ -511,14 +590,15 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 
 					if(hitbox) 
 					{
-						if((hitbox == 4 || hitbox == 8 || hitbox == 12) && player.v != 0)
+						if((hitbox == 4 || hitbox == 8 || hitbox == 12) && player.v > 0)
 						{
 							player.v = -9 * ((double) blockSize / 48);
 
 							struct objectListElement *tmp = liste->next;
-							printf("Gegner %p besiegt!!\n", liste->object);
 							objectDelete(&objectList, &liste->object);
 							liste = tmp;
+
+							score += 25;
 						}
 						else
 						{
@@ -554,7 +634,6 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 					}
 				}
 
-
 				// Zeichne alle Objekte
 				liste=objectList;
 				objectDraw( screen, liste->object );
@@ -564,6 +643,14 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 					objectDraw( screen, liste->object );
 				}
 
+				// Zeichne die Punktzahl
+				// Punktzahl einzeln Hochzählen 
+				if(scoreRender < score)
+				{scoreRender++;}
+
+				sprintf(scoreString, "%06d", scoreRender);
+				scoreText = TTF_RenderText_Solid(font, scoreString, scoreColor);
+				SDL_BlitSurface(scoreText, NULL, screen, &scorePosition);
 
 				// Zeichne das berechnete Bild
 				SDL_Flip( screen );
