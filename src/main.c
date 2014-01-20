@@ -121,6 +121,8 @@ int main( int argc, char *argv[] )
 		//~ fprintf(stderr, "Unable to play WAV file: %s\n", Mix_GetError());
 	//~ }
 
+	initializeClouds();
+
 	while (1)
 	{
 		int returnValue = drawMenu(screen, event);

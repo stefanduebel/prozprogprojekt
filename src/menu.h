@@ -118,7 +118,7 @@ menu *initializeLevelMenu();
  *
  * @param surface Zeiger auf die SDL_Surface auf welche die Wolken gerendert werden sollen
  */
-void renderClouds(SDL_Surface *surface);
+void renderClouds(SDL_Surface *surface, int camShift);
 
 /**
  * Rendert die übergebene Menüliste

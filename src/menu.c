@@ -18,9 +18,6 @@ cloud clouds[CLOUDS];
 
 int drawMenu(SDL_Surface *screen, SDL_Event event)
 {
-	/* ---- initialisiere Wolken ---- */
-	initializeClouds();
-
 	/* ---- dekalriere und initialisiere Variablen ---- */
 	int changeV = 0, changeH = 0;
 	int selectedItem = 0;
@@ -55,7 +52,7 @@ int drawMenu(SDL_Surface *screen, SDL_Event event)
 			case SDL_USEREVENT:
 				// rendere den Bildschirm neu
 				CLEAR_SURFACE(screen);
-				renderClouds(screen);
+				renderClouds(screen, 0);
 
 				if (changeV || changeH) // es sind Änderungen am Menü geschehen, also neu rendern
 					selectedItem = renderMenu(menuSurface, changeH, changeV, firstItem);
@@ -298,13 +295,14 @@ menu *initializeListMenu(char *itemNames[], unsigned char items)
 	return mainMenu;
 }
 
-void renderClouds(SDL_Surface *surface)
+void renderClouds(SDL_Surface *surface, int camShift)
 {
 	for (int i = 0; i < CLOUDS; i++)
 	{
+		clouds[i].position -= ((double) camShift / surface->clip_rect.w);
 		// bestimme die absolute Position am Himmel as den relativen Positionen der Wolke
 		SDL_Rect offset;
-		offset.x = clouds[i].position * surface->clip_rect.w;
+		offset.x = (clouds[i].position * surface->clip_rect.w);
 		offset.y = clouds[i].height * surface->clip_rect.h;
 
 		SDL_BlitSurface(clouds[i].surface, NULL, surface, &offset);

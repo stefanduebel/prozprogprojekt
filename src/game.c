@@ -12,6 +12,7 @@
 
 #include "game.h"
 #include "image.h"
+#include "menu.h"
 
 #define BLOCK_SET_WIDTH   10
 #define BLOCK_SET_HEIGHT  10
@@ -697,6 +698,9 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				// ============================== RENDERN ==============================
 				// Lösche den Hintergrund
 				SDL_FillRect( screen, NULL, color );
+
+				// Wolken, TODO: Kamerabewegung
+				renderClouds(screen, 0);
 
 
 				// Zeichne alle Blöcke

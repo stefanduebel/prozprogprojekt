@@ -4,7 +4,11 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_ttf.h>
 #include "highscore.h"
-#include "main.h"
+#ifndef MAIN_H
+	#include "main.h"
+	#define MAIN_H
+#endif
+#include "menu.h"
 
 #define HIGHSCORE_PATH "resources/highscore.txt"
 #define MAX_LENGTH 20
@@ -15,8 +19,9 @@
 // Funktion für SDL-Ausgabe
 void drawHighscore (SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct highscoreItem *highscoreList)
 {
-	SDL_FillRect(screen, &screen->clip_rect, SDL_MapRGBA(screen->format, 208, 244, 247, 0));
-	//Name anzeigen
+	CLEAR_SURFACE(screen);
+
+	/* ---- Surfaces für Name und Punktzahl ---- */
 	SDL_Surface *nameSurface[10];
 	SDL_Surface *pointsSurface[10];
 
@@ -24,7 +29,9 @@ void drawHighscore (SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct
 
 	int height = 0;
 	int entries = 0;
+	int maxWidth = 0;
 
+	/* ---- bestimmen der Anzahl der Einträge und der Gesamthöhe des Menüs ---- */
 	for(entries = 0; entries < 10; entries++)
 	{
 		if(highscoreList == NULL)
@@ -38,28 +45,42 @@ void drawHighscore (SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct
 		pointsSurface[entries] = TTF_RenderText_Solid(font, pointsString, color);
 		highscoreList = highscoreList->next;
 		height += MAX(pointsSurface[entries]->clip_rect.h, nameSurface[entries]->clip_rect.h);
+		maxWidth = MAX(maxWidth, nameSurface[entries]->clip_rect.w + pointsSurface[entries]->clip_rect.w);
 	}
+	// Zwischenräume hinzufügen
 	height += (entries - 1) * HIGHSCORE_PADDING;
 
 	int printedHeight = 0;
-	int menuOffset = (screen->clip_rect.h - height) / 2;
+	int highscoreOffsetY = (screen->clip_rect.h - height) / 2;
+	int highscoreWidth = maxWidth + 3*HIGHSCORE_PADDING;
+	SDL_Surface *highscoreSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, screen->clip_rect.w, screen->clip_rect.h, SCREEN_BPP, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+
+	/* ---- alle Einträge auf die Highscoresurface rendern ---- */
 	for(int i = 0; i < entries; i++)
 	{
 		SDL_Rect position;
-		position.x = 2 * HIGHSCORE_PADDING;
-		position.y = menuOffset + printedHeight;
-		SDL_BlitSurface(nameSurface[i], NULL, screen, &position);
+		position.x = (screen->clip_rect.w - highscoreWidth) / 2;
+		position.y = highscoreOffsetY + printedHeight;
+		SDL_BlitSurface(nameSurface[i], NULL, highscoreSurface, &position);
 
-		position.x = screen->clip_rect.w - pointsSurface[i]->clip_rect.w - 2*HIGHSCORE_PADDING;
-		SDL_BlitSurface(pointsSurface[i], NULL, screen, &position);
+		position.x = screen->clip_rect.w - pointsSurface[i]->clip_rect.w - ((screen->clip_rect.w - highscoreWidth) / 2);
+		SDL_BlitSurface(pointsSurface[i], NULL, highscoreSurface, &position);
 
 		printedHeight += nameSurface[i]->clip_rect.h + HIGHSCORE_PADDING;
 	}
-	SDL_Flip(screen);
+
 	while (SDL_WaitEvent (&event))
 	{
 		switch (event.type)
 		{
+			case SDL_USEREVENT:
+				// Hintergrund animieren und Highscores anzeigen
+				CLEAR_SURFACE(screen);
+				renderClouds(screen, 0);
+				SDL_BlitSurface(highscoreSurface, NULL, screen, NULL);
+				SDL_Flip(screen);
+				break;
+
 			case SDL_QUIT:
 				SDL_Quit();
 				exit(0);
@@ -70,7 +91,6 @@ void drawHighscore (SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct
 	}
 } 
 
-// Funktion zum Anhängen eines Eintrags an die Liste
 void append(struct highscoreItem **list, char name[], unsigned int points)
 {
 	struct highscoreItem *newElement;
