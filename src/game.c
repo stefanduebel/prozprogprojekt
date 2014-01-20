@@ -34,6 +34,17 @@ struct object
 };
 
 
+struct trigger
+{
+	unsigned int triggerX;      //X-Position des Triggers
+	unsigned int triggerY;      //Y-Position des Triggers
+	unsigned int targetX;       //X-Position des Targets
+	unsigned int targetY;       //Y-Position des Targets
+	unsigned char targetBlock;  //Zielblock des Targets
+	struct trigger *next;       //Pointer auf das nächste Element
+};
+
+
 struct objectListElement
 {
 	struct object *object;           //Pointer auf das Objekt
@@ -87,13 +98,17 @@ unsigned char blockGet(unsigned char *world, int x, int y)
 }
 
 
-/*void triggerAppend(struct objectListElement **lst, struct object *object)
+void triggerAppend(struct trigger **lst, unsigned int triggerX, unsigned int triggerY, unsigned int targetX, unsigned int targetY, unsigned char targetBlock)
 {
-	struct objectListElement *newElement;
-	struct objectListElement *lst_iter = *lst;
+	struct trigger *newElement;
+	struct trigger *lst_iter = *lst;
 
-	newElement = (struct objectListElement*) malloc(sizeof(*newElement)); // erzeuge ein neues Element
-	newElement->object = object;
+	newElement = (struct trigger*) malloc(sizeof(*newElement)); // erzeuge ein neues Element
+	newElement->triggerX = triggerX;
+	newElement->triggerY = triggerY;
+	newElement->targetX = targetX;
+	newElement->targetY = targetY;
+	newElement->targetBlock = targetBlock;
 	newElement->next = NULL; // Wichtig für das Erkennen des Listenendes
 
 	if ( lst_iter != NULL )// sind Elemente vorhanden
@@ -108,8 +123,26 @@ unsigned char blockGet(unsigned char *world, int x, int y)
 	{
 		*lst=newElement;
 	}
-}*/
+}
 
+void triggerRun(struct trigger *triggerList, unsigned char *world, unsigned int playerBlockX, unsigned int playerBlockY)
+{
+	struct trigger *triggerListTemp = triggerList;
+
+	if(triggerListTemp->triggerX == playerBlockX && triggerListTemp->triggerY == playerBlockY)
+	{
+		world[worldSizeX*triggerListTemp->targetY+triggerListTemp->targetX] = triggerListTemp->targetBlock;
+	}
+	while (triggerListTemp->next != NULL)
+	{
+		triggerListTemp=triggerListTemp->next;
+
+		if(triggerListTemp->triggerX == playerBlockX && triggerListTemp->triggerY == playerBlockY)
+		{
+			world[worldSizeX*triggerListTemp->targetY+triggerListTemp->targetX] = triggerListTemp->targetBlock;
+		}
+	}
+}
 
 void objectAppend(struct objectListElement **lst, struct object *object)
 {
@@ -381,8 +414,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	SDL_FreeSurface(tmp);
 
 	// ============================== OBJEKTE ==============================
-	struct objectListElement *objectList;
-	objectList = NULL;
+	struct objectListElement *objectList = NULL;
 
 	// Variable zum Bearbeiten der Liste
 	struct objectListElement *liste;
@@ -434,7 +466,6 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	// ============================== GEGNER ==============================
 	struct object *enemy;
 
-
 	// ENEMYS-Block suchen
 	do
 	{getline(&line, &len, worldFile);}
@@ -468,6 +499,46 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 
 		getline(&line, &len, worldFile);
 	}
+
+
+	// ============================== TRIGGER ==============================
+	struct trigger *triggerList = NULL;
+	struct trigger *triggerListTemp = NULL;
+
+	// TRIGGERS-Block suchen
+	do
+	{getline(&line, &len, worldFile);}
+	while(strcmp(line, "==TRIGGERS==\n") != 0);
+
+	getline(&line, &len, worldFile);
+	while(strcmp(line, "\n") != 0)
+	{
+		unsigned int triggerX;
+		unsigned int triggerY;
+		unsigned int targetX;
+		unsigned int targetY;
+		unsigned int targetBlock;
+
+		tok = strtok(line, ",");
+		sscanf(tok, "%u", &triggerX);
+
+		tok = strtok(NULL, ",");
+		sscanf(tok, "%u", &triggerY);
+
+		tok = strtok(NULL, ",");
+		sscanf(tok, "%u", &targetX);
+
+		tok = strtok(NULL, ",");
+		sscanf(tok, "%u", &targetY);
+
+		tok = strtok(NULL, ",");
+		sscanf(tok, "%u", &targetBlock);
+
+		triggerAppend(&triggerList, triggerX, triggerY, targetX, targetY, (unsigned char) targetBlock);
+
+		getline(&line, &len, worldFile);
+	}
+
 
 	// ============================== KAMERA ==============================
 	// Variable ist Global
@@ -554,6 +625,9 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 						if(player.v > 0)
 						{
 							world[playerBlockY][playerBlockX] = 54;
+
+							triggerRun(triggerList, &world, playerBlockX, playerBlockY);
+
 							score += 10;
 						}
 						break;
