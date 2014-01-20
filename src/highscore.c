@@ -4,15 +4,70 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_ttf.h>
 #include "highscore.h"
+#include "main.h"
 
 #define HIGHSCORE_PATH "resources/highscore.txt"
-#define MAX 20
+#define MAX_LENGTH 20
+#define MAX(x,y) ((x)<=(y) ?(y) :(x))
+#define HIGHSCORE_PADDING 20
 
 
 // Funktion für SDL-Ausgabe
-void drawHighscore (SDL_Surface *screen, TTF_Font *font, SDL_Event event)
+void drawHighscore (SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct highscoreItem *highscoreList)
 {
-	
+	SDL_FillRect(screen, &screen->clip_rect, SDL_MapRGBA(screen->format, 208, 244, 247, 0));
+	//Name anzeigen
+	SDL_Surface *nameSurface[10];
+	SDL_Surface *pointsSurface[10];
+
+	SDL_Color color = {100,100,100,0};
+
+	int height = 0;
+	int entries = 0;
+
+	for(entries = 0; entries < 10; entries++)
+	{
+		if(highscoreList == NULL)
+		{
+			entries--;
+			break;
+		}
+		nameSurface[entries] = TTF_RenderText_Solid(font, highscoreList->name, color);
+		char pointsString[7];
+		sprintf(pointsString, "%d", highscoreList->points);
+		pointsSurface[entries] = TTF_RenderText_Solid(font, pointsString, color);
+		highscoreList = highscoreList->next;
+		height += MAX(pointsSurface[entries]->clip_rect.h, nameSurface[entries]->clip_rect.h);
+	}
+	height += (entries - 1) * HIGHSCORE_PADDING;
+
+	int printedHeight = 0;
+	int menuOffset = (screen->clip_rect.h - height) / 2;
+	for(int i = 0; i < entries; i++)
+	{
+		SDL_Rect position;
+		position.x = 2 * HIGHSCORE_PADDING;
+		position.y = menuOffset + printedHeight;
+		SDL_BlitSurface(nameSurface[i], NULL, screen, &position);
+
+		position.x = screen->clip_rect.w - pointsSurface[i]->clip_rect.w - 2*HIGHSCORE_PADDING;
+		SDL_BlitSurface(pointsSurface[i], NULL, screen, &position);
+
+		printedHeight += nameSurface[i]->clip_rect.h + HIGHSCORE_PADDING;
+	}
+	SDL_Flip(screen);
+	while (SDL_WaitEvent (&event))
+	{
+		switch (event.type)
+		{
+			case SDL_QUIT:
+				SDL_Quit();
+				exit(0);
+
+			case SDL_KEYDOWN:
+				return;
+		}
+	}
 } 
 
 // Funktion zum Anhängen eines Eintrags an die Liste
@@ -55,7 +110,7 @@ struct highscoreItem *loadHighscore (void)
 	char *line = NULL;
 	size_t len = 0;
 
-	char tempName[MAX];
+	char tempName[MAX_LENGTH];
 	unsigned int tempPoints;
 	struct highscoreItem *highscoreList = NULL;
 
@@ -69,7 +124,6 @@ struct highscoreItem *loadHighscore (void)
 			tok = strtok(NULL, ",");
 			sscanf(tok, "%u", &tempPoints);
 
-			printf("Name: %s -> Points: %u\n",tempName, tempPoints);
 			append(&highscoreList, tempName, tempPoints);
 		}
 		else
@@ -127,10 +181,8 @@ void insertHighscore (struct highscoreItem **highscoreList, char name[], unsigne
 		{
 			if (currentItem->next != NULL)
 			{
-				printf("1\n");
 				if (newItem->points > currentItem->next->points)
 				{
-					printf("2\n");
 					newItem->next = currentItem->next;
 					currentItem->next = newItem;
 					break;
@@ -138,7 +190,6 @@ void insertHighscore (struct highscoreItem **highscoreList, char name[], unsigne
 			}
 			else
 			{
-				printf("3\n");
 				currentItem->next = newItem;
 				newItem->next = NULL;
 				break;
