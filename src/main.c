@@ -19,6 +19,7 @@
 
 #include "menu.h"
 #include "game.h"
+#include "highscore.h"
 
 #define FONT_SIZE 30
 
@@ -44,6 +45,8 @@ Uint32 generate_userevent (Uint32 intervall, void *parameter)
 
 int main( int argc, char *argv[] )
 {
+	struct highscoreItem *highscore = loadHighscore();
+
 	res.width = 1280;
 	res.height = 720;
 
@@ -139,6 +142,7 @@ int main( int argc, char *argv[] )
 
 				break;
 			case HIGHSCORES:
+				drawHighscore(screen, font, event, highscore);
 				printf("Zeige Highscores\n");
 				break;
 			default:
