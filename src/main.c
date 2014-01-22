@@ -116,10 +116,10 @@ int main( int argc, char *argv[] )
 
 	int channel;
 
-	//~ channel = Mix_PlayChannel(-1, sound, -1);
-	//~ if(channel == -1) {
-		//~ fprintf(stderr, "Unable to play WAV file: %s\n", Mix_GetError());
-	//~ }
+	 channel = Mix_PlayChannel(-1, sound, -1);
+	 if(channel == -1) {
+		 fprintf(stderr, "Unable to play WAV file: %s\n", Mix_GetError());
+	 }
 
 	initializeClouds();
 
@@ -133,6 +133,7 @@ int main( int argc, char *argv[] )
 
 				int exitCode;
 				exitCode = startGame (screen, event, res, 0);
+				addScore(screen, exitCode, event, &highscore);
 				if(exitCode < 0)
 				{
 					printf("Verloren!\n");

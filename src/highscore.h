@@ -45,3 +45,5 @@ void writeHighscore (struct highscoreItem *highscoreList);
  * @param points			Punktzahl des einzufügenden Spielers
  */
 void insertHighscore (struct highscoreItem **highscoreList, char name[], unsigned int points);
+
+void addScore(SDL_Surface *screen, unsigned int points, SDL_Event event, struct highscoreItem **highscore);

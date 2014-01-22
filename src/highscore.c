@@ -36,7 +36,6 @@ void drawHighscore (SDL_Surface *screen, TTF_Font *font, SDL_Event event, struct
 	{
 		if(highscoreList == NULL)
 		{
-			entries--;
 			break;
 		}
 		nameSurface[entries] = TTF_RenderText_Solid(font, highscoreList->name, color);
@@ -194,6 +193,7 @@ void insertHighscore (struct highscoreItem **highscoreList, char name[], unsigne
 	{
 		newItem->next = *highscoreList;
 		*highscoreList = newItem;
+		printf("Highscore an erster Stelle eingefügt");
 	}
 	else
 	{
@@ -205,6 +205,7 @@ void insertHighscore (struct highscoreItem **highscoreList, char name[], unsigne
 				{
 					newItem->next = currentItem->next;
 					currentItem->next = newItem;
+					printf("Highscore an mittiger Stelle eingefügt");
 					break;
 				}
 			}
@@ -212,9 +213,99 @@ void insertHighscore (struct highscoreItem **highscoreList, char name[], unsigne
 			{
 				currentItem->next = newItem;
 				newItem->next = NULL;
+				printf("Highscore an letzter Stelle eingefügt (%s, %d)\n", newItem->name, newItem->points);
 				break;
 			}
 			currentItem = currentItem->next;
 		}
 	}
+
+	writeHighscore(*highscoreList);
+}
+
+void addScore(SDL_Surface *screen, unsigned int points, SDL_Event event, struct highscoreItem **highscore)
+{
+	if (points > 0)
+	{
+		char name[11]; name[0] = 0;
+		char nextLetter = 'A';
+		int currentLetter = 0;
+
+		SDL_Surface *askNameSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, screen->clip_rect.w, screen->clip_rect.h, SCREEN_BPP, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+
+		while (SDL_WaitEvent (&event))
+		{
+			switch (event.type)
+			{
+				case SDL_USEREVENT:
+					// Hintergrund animieren und Highscores anzeigen
+					CLEAR_SURFACE(screen);
+					renderClouds(screen, 0);
+					SDL_BlitSurface(askNameSurface, NULL, screen, NULL);
+					SDL_Flip(screen);
+					break;
+
+				case SDL_QUIT:
+					SDL_Quit();
+					exit(0);
+
+				case SDL_KEYDOWN:
+					switch(event.key.keysym.sym)
+					{
+						// Pfeil hoch
+						case SDLK_UP:
+							if (nextLetter != 0)
+							{
+								nextLetter--;
+								if (nextLetter < 'A')
+									nextLetter = 'Z';
+							}
+							break;
+
+						// Pfeil runter
+						case SDLK_DOWN:
+							if (nextLetter != 0)
+							{
+								nextLetter++;
+								if (nextLetter > 'Z')
+									nextLetter = 'A';
+							}
+							break;
+
+						case SDLK_RIGHT:
+							nextLetter = 0;
+							break;
+
+						case SDLK_LEFT:
+							nextLetter = name[currentLetter-1];
+							break;
+
+						case SDLK_RETURN:
+							if (nextLetter != 0)
+							{
+								name[currentLetter] = nextLetter;
+								name[currentLetter + 1] = 0;
+								if (currentLetter < 9)
+									currentLetter++;
+								printf("%s, %c, %d\n", name, nextLetter, currentLetter);
+							}
+							else
+							{
+								printf("highscore speichern\n");
+								insertHighscore(highscore, name, points);
+								return;
+							}
+							break;
+
+						case SDLK_ESCAPE:
+							return;
+
+						default:
+							break;
+					}
+			}
+		}
+	}
+	else
+		printf("verloren\n");
 }
