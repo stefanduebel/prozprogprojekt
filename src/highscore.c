@@ -223,7 +223,7 @@ void insertHighscore (struct highscoreItem **highscoreList, char name[], unsigne
 	writeHighscore(*highscoreList);
 }
 
-void addScore(SDL_Surface *screen, unsigned int points, SDL_Event event, struct highscoreItem **highscore)
+void addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscoreItem **highscore)
 {
 	if (points > 0)
 	{
@@ -241,6 +241,27 @@ void addScore(SDL_Surface *screen, unsigned int points, SDL_Event event, struct 
 					// Hintergrund animieren und Highscores anzeigen
 					CLEAR_SURFACE(screen);
 					renderClouds(screen, 0);
+
+					// rendere Text auf askNameSurface
+					CLEAR_SURFACE(askNameSurface);
+					SDL_Color color[] = {{100,100,100,0},{255,255,255,0}};
+					SDL_Surface *tmp = TTF_RenderText_Solid(font, name, color[0]);
+					SDL_Rect pos; pos.x = 100, pos.y = 100;
+					SDL_BlitSurface(tmp, NULL, askNameSurface, &pos);
+
+					SDL_FreeSurface(tmp);
+
+					pos.x = 400;
+					char current[] = {(nextLetter != 0) ? nextLetter : 'A', '\0'};
+					tmp = TTF_RenderText_Solid(font, current, color[(nextLetter == 0) * 1]);
+					SDL_BlitSurface(tmp, NULL, askNameSurface, &pos);
+
+					SDL_FreeSurface(tmp);
+
+					pos.x = 600;
+					tmp = TTF_RenderText_Solid(font, "Bestaetigen", color[(nextLetter != 0) * 1]);
+					SDL_BlitSurface(tmp, NULL, askNameSurface, &pos);
+
 					SDL_BlitSurface(askNameSurface, NULL, screen, NULL);
 					SDL_Flip(screen);
 					break;
@@ -277,7 +298,10 @@ void addScore(SDL_Surface *screen, unsigned int points, SDL_Event event, struct 
 							break;
 
 						case SDLK_LEFT:
-							nextLetter = name[currentLetter-1];
+							if (currentLetter == 0)
+								nextLetter = 'A';
+							else
+								nextLetter = name[currentLetter-1];
 							break;
 
 						case SDLK_RETURN:
