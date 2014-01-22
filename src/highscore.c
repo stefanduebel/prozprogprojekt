@@ -227,8 +227,10 @@ void addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscore
 {
 	if (points > 0)
 	{
-		char name[11]; name[0] = 0;
-		char nextLetter = 'A';
+		char name[11];
+		for (int i = 0; i < 11; i++)
+			name[i] = 0;
+		name[0] = 'A';
 		int currentLetter = 0;
 
 		SDL_Surface *askNameSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, screen->clip_rect.w, screen->clip_rect.h, SCREEN_BPP, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
@@ -244,23 +246,14 @@ void addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscore
 
 					// rendere Text auf askNameSurface
 					CLEAR_SURFACE(askNameSurface);
-					SDL_Color color[] = {{100,100,100,0},{255,255,255,0}};
-					SDL_Surface *tmp = TTF_RenderText_Solid(font, name, color[0]);
-					SDL_Rect pos; pos.x = 100, pos.y = 100;
+					SDL_Color color = {100,100,100,0};
+					SDL_Surface *tmp = TTF_RenderText_Solid(font, name, color);
+					SDL_Rect pos;
+					pos.x = (screen->clip_rect.w - tmp->clip_rect.w) / 2;
+					pos.y = (screen->clip_rect.h - tmp->clip_rect.h) / 2;
 					SDL_BlitSurface(tmp, NULL, askNameSurface, &pos);
 
 					SDL_FreeSurface(tmp);
-
-					pos.x = 400;
-					char current[] = {(nextLetter != 0) ? nextLetter : 'A', '\0'};
-					tmp = TTF_RenderText_Solid(font, current, color[(nextLetter == 0) * 1]);
-					SDL_BlitSurface(tmp, NULL, askNameSurface, &pos);
-
-					SDL_FreeSurface(tmp);
-
-					pos.x = 600;
-					tmp = TTF_RenderText_Solid(font, "Bestaetigen", color[(nextLetter != 0) * 1]);
-					SDL_BlitSurface(tmp, NULL, askNameSurface, &pos);
 
 					SDL_BlitSurface(askNameSurface, NULL, screen, NULL);
 					SDL_Flip(screen);
@@ -275,51 +268,36 @@ void addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscore
 					{
 						// Pfeil hoch
 						case SDLK_UP:
-							if (nextLetter != 0)
-							{
-								nextLetter--;
-								if (nextLetter < 'A')
-									nextLetter = 'Z';
-							}
+							name[currentLetter]--;
+							if (name[currentLetter] < 'A')
+								name[currentLetter] = 'Z';
 							break;
 
 						// Pfeil runter
 						case SDLK_DOWN:
-							if (nextLetter != 0)
-							{
-								nextLetter++;
-								if (nextLetter > 'Z')
-									nextLetter = 'A';
-							}
+							name[currentLetter]++;
+							if (name[currentLetter] > 'Z')
+								name[currentLetter] = 'A';
 							break;
 
 						case SDLK_RIGHT:
-							nextLetter = 0;
+							if (name[currentLetter + 1] == 0 && currentLetter < 9)
+								name[currentLetter + 1] = 'A';
+							currentLetter++;
+							if (currentLetter > 9)
+									currentLetter = 9;
 							break;
 
 						case SDLK_LEFT:
-							if (currentLetter == 0)
-								nextLetter = 'A';
-							else
-								nextLetter = name[currentLetter-1];
+							currentLetter--;
+							if (currentLetter < 0)
+								currentLetter = 0;
 							break;
 
 						case SDLK_RETURN:
-							if (nextLetter != 0)
-							{
-								name[currentLetter] = nextLetter;
-								name[currentLetter + 1] = 0;
-								if (currentLetter < 9)
-									currentLetter++;
-								printf("%s, %c, %d\n", name, nextLetter, currentLetter);
-							}
-							else
-							{
-								printf("highscore speichern\n");
-								insertHighscore(highscore, name, points);
-								return;
-							}
-							break;
+							printf("highscore speichern\n");
+							insertHighscore(highscore, name, points);
+							return;
 
 						case SDLK_ESCAPE:
 							return;
