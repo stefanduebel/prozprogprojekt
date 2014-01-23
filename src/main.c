@@ -123,29 +123,36 @@ int main( int argc, char *argv[] )
 
 	initializeClouds();
 
+	int returnValue = drawMenu(screen, event);
 	while (1)
 	{
-		int returnValue = drawMenu(screen, event);
 		switch (returnValue)
 		{
+			case MENU:
+				returnValue = drawMenu(screen, event);
+				break;
+
 			case START_GAME:
-				addScore(screen, startGame (screen, event, res, 0), event, &highscore);
+				returnValue = addScore(screen, startGame (screen, event, res, 0), event, &highscore);
 				break;
 
 			case HIGHSCORES:
 				drawHighscore(screen, font, event, highscore);
+				returnValue = MENU;
 				break;
 
 			default:
 				if (returnValue >= LEVEL_OFFSET && returnValue < LEVEL_OFFSET + MAX_LEVEL)
 					startGame (screen, event, res, returnValue - LEVEL_OFFSET);
-				else
+				else if (returnValue <= EXIT_GAME)
 				{
+					printf("Spiel beenden\n");
 					freeHighscore(highscore);
-					printf("Beende Spiel\n");
 					SDL_Quit();
-					exit(returnValue);
+					exit(returnValue - EXIT_GAME);
 				}
+				else
+					returnValue = MENU;
 		}
 	}
 	
