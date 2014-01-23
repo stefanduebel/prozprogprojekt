@@ -504,7 +504,6 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 
 	// ============================== TRIGGER ==============================
 	struct trigger *triggerList = NULL;
-	struct trigger *triggerListTemp = NULL;
 
 	// TRIGGERS-Block suchen
 	do
@@ -627,7 +626,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 						{
 							world[playerBlockY][playerBlockX] = 54;
 
-							triggerRun(triggerList, &world, playerBlockX, playerBlockY);
+							triggerRun(triggerList, &world[0][0], playerBlockX, playerBlockY);
 
 							score += 10;
 						}
@@ -670,7 +669,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 							player.v = -9 * ((double) blockSize / 48);
 
 							struct objectListElement *tmp = liste->next;
-							objectDelete(&objectList, &liste->object);
+							objectDelete(&objectList, liste);
 							liste = tmp;
 
 							score += 25;
