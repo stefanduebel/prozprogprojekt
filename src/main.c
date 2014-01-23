@@ -129,30 +129,19 @@ int main( int argc, char *argv[] )
 		switch (returnValue)
 		{
 			case START_GAME:
-				printf("Starte Spiel\n");
-
-				int exitCode;
-				exitCode = startGame (screen, event, res, 0);
-				addScore(screen, exitCode, event, &highscore);
-				if(exitCode < 0)
-				{
-					printf("Verloren!\n");
-				}
-				else if(exitCode > 0)
-				{
-					printf("Deine Punktzahl: %d\n", exitCode);
-				}
-
+				addScore(screen, startGame (screen, event, res, 0), event, &highscore);
 				break;
+
 			case HIGHSCORES:
 				drawHighscore(screen, font, event, highscore);
-				printf("Zeige Highscores\n");
 				break;
+
 			default:
 				if (returnValue >= LEVEL_OFFSET && returnValue < LEVEL_OFFSET + MAX_LEVEL)
 					startGame (screen, event, res, returnValue - LEVEL_OFFSET);
 				else
 				{
+					freeHighscore(highscore);
 					printf("Beende Spiel\n");
 					SDL_Quit();
 					exit(returnValue);

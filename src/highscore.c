@@ -118,6 +118,17 @@ void append(struct highscoreItem **list, char name[], unsigned int points)
 	}
 }
 
+// Speicher leeren
+void freeHighscore(struct highscoreItem *highscoreList)
+{
+	if (highscoreList->next == NULL)
+	{
+		freeHighscore(highscoreList->next);
+	}
+	free (highscoreList->name);
+	free (highscoreList);
+}
+
 // Funktion zum Laden des Highscores
 struct highscoreItem *loadHighscore (void)
 {
@@ -193,7 +204,6 @@ void insertHighscore (struct highscoreItem **highscoreList, char name[], unsigne
 	{
 		newItem->next = *highscoreList;
 		*highscoreList = newItem;
-		printf("Highscore an erster Stelle eingefügt");
 	}
 	else
 	{
@@ -205,7 +215,6 @@ void insertHighscore (struct highscoreItem **highscoreList, char name[], unsigne
 				{
 					newItem->next = currentItem->next;
 					currentItem->next = newItem;
-					printf("Highscore an mittiger Stelle eingefügt");
 					break;
 				}
 			}
@@ -213,7 +222,6 @@ void insertHighscore (struct highscoreItem **highscoreList, char name[], unsigne
 			{
 				currentItem->next = newItem;
 				newItem->next = NULL;
-				printf("Highscore an letzter Stelle eingefügt (%s, %d)\n", newItem->name, newItem->points);
 				break;
 			}
 			currentItem = currentItem->next;
@@ -302,7 +310,6 @@ void addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscore
 							break;
 
 						case SDLK_RETURN:
-							printf("highscore speichern\n");
 							insertHighscore(highscore, name, points);
 							return;
 
@@ -315,6 +322,4 @@ void addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscore
 			}
 		}
 	}
-	else
-		printf("verloren\n");
 }

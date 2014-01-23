@@ -47,3 +47,6 @@ void writeHighscore (struct highscoreItem *highscoreList);
 void insertHighscore (struct highscoreItem **highscoreList, char name[], unsigned int points);
 
 void addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscoreItem **highscore);
+
+void freeHighscore(struct highscoreItem *highscoreList);
+
