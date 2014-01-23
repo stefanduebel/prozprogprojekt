@@ -228,12 +228,41 @@ void insertHighscore (struct highscoreItem **highscoreList, char name[], unsigne
 		}
 	}
 
+	struct highscoreItem *highscoreNew = *highscoreList;
+	int items = 1;
+	while ((highscoreNew->next != NULL) && (items < 10))
+	{
+		highscoreNew = highscoreNew->next;
+		items++;
+	}
+
+	if (highscoreNew->next != NULL)
+	{
+		freeHighscore(highscoreNew->next);
+		highscoreNew->next = NULL;
+	}
+
 	writeHighscore(*highscoreList);
 }
 
 void addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscoreItem **highscore)
 {
-	if (points > 0)
+	int pointsMin = 0;
+	if (*highscore != NULL)
+	{
+		struct highscoreItem *highscoreNew = *highscore;
+		int items = 1;
+		while (highscoreNew->next != NULL)
+		{
+			highscoreNew = highscoreNew->next;
+			items++;
+		}
+		if (items < 10)
+			pointsMin = 0;
+		else
+			pointsMin = (int) highscoreNew->points;
+	}
+	if (points > pointsMin)
 	{
 		char name[11];
 		for (int i = 0; i < 11; i++)
