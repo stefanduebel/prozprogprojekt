@@ -14,6 +14,9 @@
 #include "image.h"
 #include "menu.h"
 
+// Schaltet die Debugfunktionen ein
+//#define DEBUG
+
 #define BLOCK_SET_WIDTH   10
 #define BLOCK_SET_HEIGHT  10
 #define BLOCK_SET_SIZE    (BLOCK_SET_WIDTH * BLOCK_SET_HEIGHT)
@@ -756,38 +759,40 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 							{player.v = -9 * ((double) blockSize / 48);}
 						break;
 
-					// Pfeil hoch
-					case SDLK_q:
-						a *= -1;
-						break;
-					// W
-					case SDLK_w:
-						if(world[(player.posY + player.sizeY / 2) / blockSize - 1][(player.posX + player.sizeX / 2) / blockSize    ] < 50)
-						{  world[(player.posY + player.sizeY / 2) / blockSize - 1][(player.posX + player.sizeX / 2) / blockSize    ] = 255;}
-						else
-						{  world[(player.posY + player.sizeY / 2) / blockSize - 1][(player.posX + player.sizeX / 2) / blockSize    ] = 4;}
-						break;
-					// S
-					case SDLK_s:
-						if(world[(player.posY + player.sizeY / 2) / blockSize + 1][(player.posX + player.sizeX / 2) / blockSize    ] < 50)
-						{  world[(player.posY + player.sizeY / 2) / blockSize + 1][(player.posX + player.sizeX / 2) / blockSize    ] = 255;}
-						else
-						{  world[(player.posY + player.sizeY / 2) / blockSize + 1][(player.posX + player.sizeX / 2) / blockSize    ] = 4;}
-						break;
-					// A
-					case SDLK_a:
-						if(world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize - 1] < 50)
-						{  world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize - 1] = 255;}
-						else
-						{  world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize - 1] = 4;}
-						break;
-					// D
-					case SDLK_d:
-						if(world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize + 1] < 50)
-						{  world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize + 1] = 255;}
-						else
-						{  world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize + 1] = 4;}
-						break;
+					#ifdef DEBUG
+						// Schwerkraft umkehren
+						case SDLK_q:
+							a *= -1;
+							break;
+						// W
+						case SDLK_w:
+							if(world[(player.posY + player.sizeY / 2) / blockSize - 1][(player.posX + player.sizeX / 2) / blockSize    ] < 50)
+							{  world[(player.posY + player.sizeY / 2) / blockSize - 1][(player.posX + player.sizeX / 2) / blockSize    ] = 255;}
+							else
+							{  world[(player.posY + player.sizeY / 2) / blockSize - 1][(player.posX + player.sizeX / 2) / blockSize    ] = 4;}
+							break;
+						// S
+						case SDLK_s:
+							if(world[(player.posY + player.sizeY / 2) / blockSize + 1][(player.posX + player.sizeX / 2) / blockSize    ] < 50)
+							{  world[(player.posY + player.sizeY / 2) / blockSize + 1][(player.posX + player.sizeX / 2) / blockSize    ] = 255;}
+							else
+							{  world[(player.posY + player.sizeY / 2) / blockSize + 1][(player.posX + player.sizeX / 2) / blockSize    ] = 4;}
+							break;
+						// A
+						case SDLK_a:
+							if(world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize - 1] < 50)
+							{  world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize - 1] = 255;}
+							else
+							{  world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize - 1] = 4;}
+							break;
+						// D
+						case SDLK_d:
+							if(world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize + 1] < 50)
+							{  world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize + 1] = 255;}
+							else
+							{  world[(player.posY + player.sizeY / 2) / blockSize    ][(player.posX + player.sizeX / 2) / blockSize + 1] = 4;}
+							break;
+					#endif
 
 					// Escape
 					case SDLK_ESCAPE:
