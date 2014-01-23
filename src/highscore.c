@@ -250,7 +250,14 @@ void addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscore
 					SDL_Surface *tmp = TTF_RenderText_Solid(font, name, color);
 					SDL_Rect pos;
 					pos.x = (screen->clip_rect.w - tmp->clip_rect.w) / 2;
-					pos.y = (screen->clip_rect.h - tmp->clip_rect.h) / 2;
+					pos.y = (screen->clip_rect.h - tmp->clip_rect.h) / 2 + tmp->clip_rect.h;
+					SDL_BlitSurface(tmp, NULL, askNameSurface, &pos);
+
+					SDL_FreeSurface(screen);
+
+					tmp = TTF_RenderText_Solid(font, "Bitte Namen eingeben", color);
+					pos.x = (screen->clip_rect.w - tmp->clip_rect.w) / 2;
+					pos.y = (screen->clip_rect.h - tmp->clip_rect.h) / 2 - tmp->clip_rect.h;
 					SDL_BlitSurface(tmp, NULL, askNameSurface, &pos);
 
 					SDL_FreeSurface(tmp);
