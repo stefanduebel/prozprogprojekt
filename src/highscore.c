@@ -121,7 +121,7 @@ void append(struct highscoreItem **list, char name[], unsigned int points)
 // Speicher leeren
 void freeHighscore(struct highscoreItem *highscoreList)
 {
-	if (highscoreList->next == NULL)
+	if (highscoreList->next != NULL)
 	{
 		freeHighscore(highscoreList->next);
 	}
@@ -146,7 +146,7 @@ struct highscoreItem *loadHighscore (void)
 
 	while(1)
 	{
-		if(getline (&line, &len, highscoreFile) != -1)
+		if(getline (&line, &len, highscoreFile) > 3)
 		{
 			char *tok = strtok(line, ",");
 			strcpy(tempName, tok);
@@ -200,7 +200,7 @@ void insertHighscore (struct highscoreItem **highscoreList, char name[], unsigne
 	strcpy(newItem->name, name);
 	newItem->points = points;
 
-	if (newItem->points > currentItem->points)
+	if (currentItem == NULL || newItem->points > currentItem->points)
 	{
 		newItem->next = *highscoreList;
 		*highscoreList = newItem;
