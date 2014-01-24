@@ -311,15 +311,15 @@ int addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscoreI
 				case SDL_KEYDOWN:
 					switch(event.key.keysym.sym)
 					{
-						// Pfeil hoch
-						case SDLK_UP:
+						// Pfeil runter
+						case SDLK_DOWN:
 							name[currentLetter]--;
 							if (name[currentLetter] < 'A')
 								name[currentLetter] = 'Z';
 							break;
 
-						// Pfeil runter
-						case SDLK_DOWN:
+						// Pfeil hoch
+						case SDLK_UP:
 							name[currentLetter]++;
 							if (name[currentLetter] > 'Z')
 								name[currentLetter] = 'A';
