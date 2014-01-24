@@ -45,11 +45,12 @@ void playGameMusic()
 
 void playCoinSound(char num)
 {
-	printf("play coin sound\n");
+	char file[40];
+	sprintf(file, "resources/sounds/8_bit_coins/coin%d.ogg", (int) num + 1);
 	Mix_Chunk *sound;
-	sound = Mix_LoadWAV("resources/sounds/8_bit_coins/coin1.ogg");
+	sound = Mix_LoadWAV(file);
 	if(sound == NULL) {
-		fprintf(stderr, "Unable to load WAV file: %s\n", Mix_GetError());
+		fprintf(stderr, "Unable to load WAV file (%s): %s\n", file, Mix_GetError());
 	}
 
 	int channel;
