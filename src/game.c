@@ -22,37 +22,46 @@
 #define BLOCK_SET_SIZE    (BLOCK_SET_WIDTH * BLOCK_SET_HEIGHT)
 
 
-// Strukturen
+/** 
+ * Struktur für Objekte, wie den Spieler und die Gegner
+ */
 struct object
 {
-	int type;                //Typ des Objekt (0 = Spieler; 1 = NPC; 2 = Statisch)
-	SDL_Surface *sprite;     //Pointer auf SDL-Surface, welches die Spritemap enthält
-	int posX;                //X-Position
-	int posY;                //Y-Position
-	int sizeX;               //Breite
-	int sizeY;               //Höhe
-	double v;                //Vertikal-Geschindigkeit
-	short moveDir;           //Bewegungsrichtung (-1 = Links; 1 = Rechts)
-	unsigned int moveSpeed;  //Bewegungsgeschwindigkeit
-	int frame;               //Aktueller Animationsframe
+	int type;                /*!< Typ des Objekt (0 = Spieler; 1 = NPC; 2 = Statisch) */
+	SDL_Surface *sprite;     /*!< Pointer auf SDL-Surface, welches die Spritemap enthält */
+	int posX;                /*!< X-Position */
+	int posY;                /*!< Y-Position */
+	int sizeX;               /*!< Breite */
+	int sizeY;               /*!< Höhe */
+	double v;                /*!< Vertikal-Geschwindigkeit */
+	short moveDir;           /*!< Bewegungsrichtung (-1 = Links; 1 = Rechts) */
+	unsigned int moveSpeed;  /*!< Bewegungsgeschwindigkeit */
+	int frame;               /*!< Aktueller Animationsframe */
 };
 
 
-struct trigger
-{
-	unsigned int triggerX;      //X-Position des Triggers
-	unsigned int triggerY;      //Y-Position des Triggers
-	unsigned int targetX;       //X-Position des Targets
-	unsigned int targetY;       //Y-Position des Targets
-	unsigned char targetBlock;  //Zielblock des Targets
-	struct trigger *next;       //Pointer auf das nächste Element
-};
-
-
+/** 
+ * Struktur für ein Listenelement der Objektliste
+ */
 struct objectListElement
 {
-	struct object *object;           //Pointer auf das Objekt
-	struct objectListElement *next;  //Pointer auf das nächste Element
+	struct object *object;           /*!< Pointer auf das Objekt */
+	struct objectListElement *next;  /*!< Pointer auf das nächste Element */
+};
+
+
+/** 
+ * Struktur für Trigger
+ * Beim Auslösen eines Triggers auf einem Block, wird ein andere modifiziert.
+ */
+struct trigger
+{
+	unsigned int triggerX;      /*!< X-Position des Triggers */
+	unsigned int triggerY;      /*!< Y-Position des Triggers */
+	unsigned int targetX;       /*!< X-Position des Targets */
+	unsigned int targetY;       /*!< Y-Position des Targets */
+	unsigned char targetBlock;  /*!< Zielblock des Targets */
+	struct trigger *next;       /*!< Pointer auf das nächste Element */
 };
 
 
@@ -64,6 +73,17 @@ double a;
 struct {int x;} camPosition;
 int score;
 
+
+/**
+ * \brief Zeichne einen Block auf den Bildschirm
+ *
+ * Diese Funktion zeichnet einen Block aus der Spritemap an einen definierten Ort auf den Bildschirm
+ * @param *screen Pointer auf die SDL_Surface des Bildschirms
+ * @param *bitmap Pointer auf die SDL_Surface, welche die Spritemap enthält
+ * @param x X-Position des Blocks, der gezeichnet werden soll
+ * @param y Y-Position des Blocks, der gezeichnet werden soll
+ * @param blocktype Typ des Blocks, der gezeichnet werden soll
+ */
 void blockDraw(SDL_Surface *screen, SDL_Surface *bitmap, int x, int y, int blocktype)
 {
 	if(blocktype >= 0 && blocktype <= BLOCK_SET_SIZE)
@@ -82,12 +102,21 @@ void blockDraw(SDL_Surface *screen, SDL_Surface *bitmap, int x, int y, int block
 		destination.w = blockSize;
 		destination.h = blockSize;
 
-		// Block auf den Screen zeichnen
+		// Block auf den Bildschirm zeichnen
 		SDL_BlitSurface(bitmap, &source, screen, &destination);
 	}
 }
 
 
+/**
+ * \brief Rufe den Typ eines Blocks in der Welt ab
+ *
+ * Diese Funktion gibt den Typ eines Blocks in der Welt zurück.
+ * @param *world Pointer auf das Welt-Array
+ * @param x X-Position des Blocks
+ * @param y Y-Position des Blocks
+ * @return Typ des Blocks
+ */
 unsigned char blockGet(unsigned char *world, int x, int y)
 {
 	// wenn existierender Block -> den Typ zurückgeben
@@ -102,6 +131,16 @@ unsigned char blockGet(unsigned char *world, int x, int y)
 }
 
 
+/**
+ * \brief Hänge einen neuen Trigger an die Triggerliste an
+ *
+ * @param **list Pointer auf einen Pointer auf das erste Element der Liste
+ * @param triggerX X-Position des Triggers
+ * @param triggerY Y-Position des Triggers
+ * @param targetX X-Position des Targets
+ * @param targetY Y-Position des Targets
+ * @param targetBlock Zielblock des Targets
+ */
 void triggerAppend(struct trigger **lst, unsigned int triggerX, unsigned int triggerY, unsigned int targetX, unsigned int targetY, unsigned char targetBlock)
 {
 	struct trigger *newElement;
@@ -129,6 +168,17 @@ void triggerAppend(struct trigger **lst, unsigned int triggerX, unsigned int tri
 	}
 }
 
+
+/**
+ * \brief Hänge einen neuen Trigger an die Triggerliste an
+ *
+ * @param **list Pointer auf einen Pointer auf das erste Element der Liste
+ * @param triggerX X-Position des Triggers
+ * @param triggerY Y-Position des Triggers
+ * @param targetX X-Position des Targets
+ * @param targetY Y-Position des Targets
+ * @param targetBlock Zielblock des Targets
+ */
 void triggerRun(struct trigger *triggerList, unsigned char *world, unsigned int playerBlockX, unsigned int playerBlockY)
 {
 	struct trigger *triggerListTemp = triggerList;
@@ -147,6 +197,7 @@ void triggerRun(struct trigger *triggerList, unsigned char *world, unsigned int 
 		}
 	}
 }
+
 
 void objectAppend(struct objectListElement **lst, struct object *object)
 {
