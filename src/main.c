@@ -20,6 +20,7 @@
 #include "menu.h"
 #include "game.h"
 #include "highscore.h"
+#include "sound.h"
 
 #define FONT_SIZE 30
 
@@ -96,30 +97,8 @@ int main( int argc, char *argv[] )
 
 	SDL_ShowCursor(0);
 
-	// Audio
-	int audioRate = 22050;
-	Uint16 audioFormat = AUDIO_S16SYS;
-	int audioChannels = 2;
-	int audioBuffers = 4096;
-
-	if(Mix_OpenAudio(audioRate, audioFormat, audioChannels, audioBuffers) != 0) {
-		fprintf(stderr, "Unable to initialize audio: %s\n", Mix_GetError());
-		exit(1);
-	}
-
-	Mix_Chunk *sound = NULL;
-
-	sound = Mix_LoadWAV("resources/jeopardy.wav");
-	if(sound == NULL) {
-		fprintf(stderr, "Unable to load WAV file: %s\n", Mix_GetError());
-	}
-
-	int channel;
-
-	 channel = Mix_PlayChannel(-1, sound, -1);
-	 if(channel == -1) {
-		 fprintf(stderr, "Unable to play WAV file: %s\n", Mix_GetError());
-	 }
+	initializeSounds();
+	playMenuMusic();
 
 	initializeClouds();
 
@@ -133,7 +112,7 @@ int main( int argc, char *argv[] )
 				break;
 
 			case START_GAME:
-				returnValue = addScore(screen, startGame (screen, event, res, 0), event, &highscore);
+				returnValue = LEVEL_OFFSET;
 				break;
 
 			case HIGHSCORES:
@@ -143,12 +122,18 @@ int main( int argc, char *argv[] )
 
 			default:
 				if (returnValue >= LEVEL_OFFSET && returnValue < LEVEL_OFFSET + MAX_LEVEL)
-					startGame (screen, event, res, returnValue - LEVEL_OFFSET);
+				{
+					playGameMusic();
+					returnValue = addScore(screen, startGame (screen, event, res, 0), event, &highscore);
+					playMenuMusic();
+				}
 				else if (returnValue <= EXIT_GAME)
 				{
 					printf("Spiel beenden\n");
 					freeHighscore(highscore);
 					SDL_Quit();
+					Mix_CloseAudio();
+					Mix_Quit();
 					exit(returnValue - EXIT_GAME);
 				}
 				else

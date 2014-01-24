@@ -13,8 +13,8 @@ OBJDIR = bin/obj
 
 all: game
 
-game: init $(OBJDIR)/main.o $(OBJDIR)/game.o $(OBJDIR)/menu.o $(OBJDIR)/image.o $(OBJDIR)/highscore.o
-	$(CC) $(OBJDIR)/main.o $(OBJDIR)/game.o $(OBJDIR)/menu.o $(OBJDIR)/image.o $(OBJDIR)/highscore.o $(CFLAGS) $(SDL) -o bin/game
+game: init $(OBJDIR)/main.o $(OBJDIR)/game.o $(OBJDIR)/menu.o $(OBJDIR)/image.o $(OBJDIR)/highscore.o $(OBJDIR)/sound.o
+	$(CC) $(OBJDIR)/main.o $(OBJDIR)/game.o $(OBJDIR)/menu.o $(OBJDIR)/image.o $(OBJDIR)/highscore.o $(OBJDIR)/sound.o $(CFLAGS) $(SDL) -o bin/game
 
 init:
 	mkdir -p bin
@@ -32,9 +32,11 @@ $(OBJDIR)/menu.o: src/menu.c
 $(OBJDIR)/image.o: src/image.c
 	$(CC) src/image.c $(CFLAGS) $(SDL) -c -o $(OBJDIR)/image.o
 
-
 $(OBJDIR)/highscore.o: src/highscore.c
 	$(CC) src/highscore.c $(CFLAGS) $(SDL) -c -o $(OBJDIR)/highscore.o
+
+$(OBJDIR)/sound.o: src/sound.c
+	$(CC) src/sound.c $(CFLAGS) $(SDL) -c -o $(OBJDIR)/sound.o
 
 clean:
 	rm -Rf bin

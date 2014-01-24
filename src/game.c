@@ -18,6 +18,7 @@
 #include "game.h"
 #include "image.h"
 #include "menu.h"
+#include "sound.h"
 
 // Schaltet die Debugfunktionen ein
 //#define DEBUG
@@ -611,18 +612,21 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 					// Goldene Münze
 					case 50:
 						world[playerBlockY][playerBlockX] = 255;
+						playCoinSound(0);
 						score += 50;
 						break;
 
 					// Silberne Münze
 					case 51:
 						world[playerBlockY][playerBlockX] = 255;
+						playCoinSound(1);
 						score += 30;
 						break;
 
 					// Bronzefarbene Münze
 					case 52:
 						world[playerBlockY][playerBlockX] = 255;
+						playCoinSound(2);
 						score += 15;
 						break;
 
