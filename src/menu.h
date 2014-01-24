@@ -23,15 +23,6 @@
 #define SETTINGS_MENU 1
 #define LEVEL_MENU 2
 
-/** Flags für die Rükgabewerte */
-#define FAILURE -1
-#define EXIT_GAME 0
-#define START_GAME 1
-#define HIGHSCORES 2
-
-#define LEVEL_OFFSET 20
-#define MAX_LEVEL 80
-
 /** Makro zum löschen des gesamten Bildschirminhaltes einer Surface
  * @param surf Zeiger auf die SDL_Surface welche geleert werden soll
  */

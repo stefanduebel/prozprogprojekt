@@ -121,7 +121,7 @@ void append(struct highscoreItem **list, char name[], unsigned int points)
 // Speicher leeren
 void freeHighscore(struct highscoreItem *highscoreList)
 {
-	if (highscoreList->next == NULL)
+	if (highscoreList->next != NULL)
 	{
 		freeHighscore(highscoreList->next);
 	}
@@ -146,7 +146,7 @@ struct highscoreItem *loadHighscore (void)
 
 	while(1)
 	{
-		if(getline (&line, &len, highscoreFile) != -1)
+		if(getline (&line, &len, highscoreFile) > 3)
 		{
 			char *tok = strtok(line, ",");
 			strcpy(tempName, tok);
@@ -200,7 +200,7 @@ void insertHighscore (struct highscoreItem **highscoreList, char name[], unsigne
 	strcpy(newItem->name, name);
 	newItem->points = points;
 
-	if (newItem->points > currentItem->points)
+	if (currentItem == NULL || newItem->points > currentItem->points)
 	{
 		newItem->next = *highscoreList;
 		*highscoreList = newItem;
@@ -228,12 +228,42 @@ void insertHighscore (struct highscoreItem **highscoreList, char name[], unsigne
 		}
 	}
 
+	struct highscoreItem *highscoreNew = *highscoreList;
+	int items = 1;
+	while ((highscoreNew->next != NULL) && (items < 10))
+	{
+		highscoreNew = highscoreNew->next;
+		items++;
+	}
+
+	if (highscoreNew->next != NULL)
+	{
+		freeHighscore(highscoreNew->next);
+		highscoreNew->next = NULL;
+	}
+
 	writeHighscore(*highscoreList);
 }
 
-void addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscoreItem **highscore)
+int addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscoreItem **highscore)
 {
-	if (points > 0)
+	int pointsMin = 0;
+	if (*highscore != NULL)
+	{
+		struct highscoreItem *highscoreNew = *highscore;
+		int items = 1;
+		while (highscoreNew->next != NULL)
+		{
+			highscoreNew = highscoreNew->next;
+			items++;
+		}
+		if (items < 10)
+			pointsMin = 0;
+		else
+			pointsMin = (int) highscoreNew->points;
+	}
+
+	if (points > pointsMin)
 	{
 		char name[11];
 		for (int i = 0; i < 11; i++)
@@ -311,10 +341,10 @@ void addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscore
 
 						case SDLK_RETURN:
 							insertHighscore(highscore, name, points);
-							return;
+							return MENU;
 
 						case SDLK_ESCAPE:
-							return;
+							return MENU;
 
 						default:
 							break;
@@ -322,4 +352,10 @@ void addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscore
 			}
 		}
 	}
+	else if (points < 0)
+		return points;
+	else
+		return 0;
+
+	return FAILURE;
 }

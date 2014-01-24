@@ -1,8 +1,3 @@
-#ifndef MAIN_H
-#include "main.h"
-#define MAIN_H
-#endif
-
 /**
  * Diese Funktion zeichnet eine Block aus einer Grafik welche alle möglichen Blöcke beinhaltet auf den Bildschirm
  *

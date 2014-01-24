@@ -10,6 +10,11 @@
 #include <SDL/SDL_ttf.h>
 #include <SDL/SDL_image.h>
 
+#ifndef MAIN_H
+#include "main.h"
+#define MAIN_H
+#endif
+
 #include "game.h"
 #include "image.h"
 #include "menu.h"
@@ -400,7 +405,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	sprintf(filepath, "resources/maps/level%d.map", level);
 	FILE *worldFile = fopen(filepath, "r");
 	if (worldFile == NULL)
-		return -1;
+		return FAILURE;
 	char *line = NULL;
 	size_t len = 0;
 	char *tok = NULL;
@@ -619,9 +624,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 			// Quit-Event: quit-Flag setzen
 			case SDL_QUIT:
 			{
-				printf("Beende Spiel\n");
-				SDL_Quit();
-				exit(0);
+				return EXIT_GAME;
 				break;
 			}
 
@@ -648,7 +651,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 
 				// Spieler in vertikaler Richtung aus der Welt
 				if(player.posY < 0-blockSize || player.posY > worldSizeY*blockSize)
-				{return -1;}
+				{return GAME_OVER;}
 
 				// Blocklogik
 				// Körpermitte
@@ -730,7 +733,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 						}
 						else
 						{
-							return -1;
+							return GAME_OVER;
 						}
 					}
 					else
@@ -847,7 +850,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 
 					// Escape
 					case SDLK_ESCAPE:
-						return 0;
+						return EXIT_LEVEL;
 						break;
 					// alles andere ignorieren
 					default:
@@ -874,5 +877,5 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 		}
 	}
 
-	return 0;
+	return FAILURE;
 }
