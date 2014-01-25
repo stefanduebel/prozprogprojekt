@@ -1,4 +1,4 @@
-# Jump and Run Game
+# Planung
 
 ## Spezifikationen
 
@@ -29,8 +29,8 @@ Die Kernfunktionalitäten des Spieles sollen hierbei sein:
 ## CodeStil
 
 * Einrückung
-    * Allman / BSD (https://de.wikipedia.org/wiki/Einr%C3%BCckungsstil#Allman_.2F_BSD_.2F_.E2.80.9EEast_Coast.E2.80.9C)
-    * Tabs
+	* Allman / BSD (https://de.wikipedia.org/wiki/Einr%C3%BCckungsstil#Allman_.2F_BSD_.2F_.E2.80.9EEast_Coast.E2.80.9C)
+	* Tabs
 * Klammern verwenden
 * Variablen und Funktionsnamen:
 	* grundsätzlich klein geschrieben
@@ -41,3 +41,4 @@ Die Kernfunktionalitäten des Spieles sollen hierbei sein:
 * defines
 	* alle Zeichen groß geschrieben
 	* wenn aus mehreren Wörtern bestehend Trennung per Unterstrich (z. B. SCREEN_BPP)
+
