@@ -667,9 +667,6 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 
 				// Blocklogik
 				// Körpermitte
-				playerBlockXold = playerBlockX;
-				playerBlockYold = playerBlockY;
-
 				playerBlockX = (player.posX + player.sizeX / 2) / blockSize;
 				playerBlockY = (player.posY + player.sizeY / 2) / blockSize;
 
@@ -728,6 +725,9 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 						}
 						break;
 				}
+
+				playerBlockXold = playerBlockX;
+				playerBlockYold = playerBlockY;
 
 				// Füße
 				playerBlockX = (player.posX + player.sizeX / 2) / blockSize;
