@@ -78,7 +78,7 @@ int blockSize;
 double a;
 struct {int x;} camPosition;
 int score;
-
+int exitCode;
 
 /**
  * \brief Zeichne einen Block auf den Bildschirm
@@ -625,7 +625,8 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 			// Quit-Event: quit-Flag setzen
 			case SDL_QUIT:
 			{
-				return EXIT_GAME;
+				exitCode = EXIT_GAME;
+				goto cleanGame;
 				break;
 			}
 
@@ -652,7 +653,10 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 
 				// Spieler in vertikaler Richtung aus der Welt
 				if(player.posY < 0-blockSize || player.posY > worldSizeY*blockSize)
-				{return GAME_OVER;}
+				{
+					exitCode =  GAME_OVER;
+					goto cleanGame;
+				}
 
 				// Blocklogik
 				// Körpermitte
@@ -695,7 +699,8 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 
 					// Levelausgang
 					case 55:
-						return score;
+						exitCode = score;
+						goto cleanGame;
 						break;
 
 					// Sprungfeder (Unten)
@@ -737,7 +742,8 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 						}
 						else
 						{
-							return GAME_OVER;
+							exitCode = GAME_OVER;
+							goto cleanGame;
 						}
 					}
 					else
@@ -854,7 +860,8 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 
 					// Escape
 					case SDLK_ESCAPE:
-						return EXIT_LEVEL;
+						exitCode = EXIT_LEVEL;
+						goto cleanGame;
 						break;
 					// alles andere ignorieren
 					default:
@@ -881,5 +888,12 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 		}
 	}
 
-	return FAILURE;
+	cleanGame:
+	// ============================== AUFRÄUMEN ==============================
+	printf("Gebe Speicher frei ...");
+	SDL_FreeSurface(blockset);
+	SDL_FreeSurface(player.sprite);
+	printf(" done\n");
+
+	return exitCode;
 }
