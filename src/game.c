@@ -521,6 +521,8 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	short playMoveRight = 0;
 	unsigned int playerBlockX = 0;
 	unsigned int playerBlockY = 0;
+	unsigned int playerBlockXold = 0;
+	unsigned int playerBlockYold = 0;
 	unsigned char hitbox = 0;
 
 
@@ -660,8 +662,12 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 
 				// Blocklogik
 				// Körpermitte
+				playerBlockXold = playerBlockX;
+				playerBlockYold = playerBlockY;
+
 				playerBlockX = (player.posX + player.sizeX / 2) / blockSize;
 				playerBlockY = (player.posY + player.sizeY / 2) / blockSize;
+
 				switch(world[playerBlockY][playerBlockX])
 				{
 					// Goldene Münze
@@ -707,6 +713,14 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 					case 57:
 						player.v = 2 * -9 * ((double) blockSize / 48);
 						world[playerBlockY][playerBlockX] = 56;
+						break;
+
+					// Leere Blöcke
+					case 255:
+						if(playerBlockX != playerBlockXold || playerBlockY != playerBlockYold)
+						{
+							triggerRun(triggerList, &world[0][0], playerBlockX, playerBlockY);
+						}
 						break;
 				}
 
