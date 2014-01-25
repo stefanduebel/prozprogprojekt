@@ -55,8 +55,8 @@ void playCoinSound(char num)
 
 	int channel;
 
-	 channel = Mix_PlayChannel(-1, sound, 0);
-	 if(channel == -1) {
-		 fprintf(stderr, "Unable to play WAV file: %s\n", Mix_GetError());
-	 }
+	channel = Mix_PlayChannel(-1, sound, 0);
+	if(channel == -1) {
+		fprintf(stderr, "Unable to play WAV file: %s\n", Mix_GetError());
+	}
 }
