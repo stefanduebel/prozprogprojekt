@@ -529,6 +529,11 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	// ============================== GEGNER ==============================
 	struct object *enemy;
 
+	// Lade Grafik für die Gegner
+	SDL_Surface *tmp2 = IMG_Load("resources/images/enemy.png");
+	SDL_Surface *enemySprite = shrinkSurface(tmp2, (int)((double) 36/48 * blockSize * 10), blockSize*2);
+	SDL_FreeSurface(tmp2);
+
 	// ENEMYS-Block suchen
 	do
 	{getline(&line, &len, worldFile);}
@@ -547,7 +552,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 		enemy->moveSpeed = 3;
 		enemy->frame     = 0;
 
-		enemy->sprite = player.sprite;
+		enemy->sprite = enemySprite;
 
 		// Zeile: Position des Gegners
 		tok = strtok(line, ",");
@@ -907,6 +912,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	printf("Gebe Speicher frei ...");
 	SDL_FreeSurface(blockset);
 	SDL_FreeSurface(player.sprite);
+	SDL_FreeSurface(enemySprite);
 	printf(" done\n");
 
 	return exitCode;
