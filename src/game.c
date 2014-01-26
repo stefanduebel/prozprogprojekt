@@ -474,6 +474,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	SDL_Surface *blockset = shrinkSurface(tmp, blockSize * BLOCK_SET_WIDTH, blockSize * BLOCK_SET_HEIGHT);
 	SDL_FreeSurface(tmp);
 
+
 	// ============================== OBJEKTE ==============================
 	struct objectListElement *objectList = NULL;
 
@@ -612,6 +613,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	camPosition.x = 0;
 	int camPositionXold = 0;
 
+
 	// ============================== PUNKTE ==============================
 	score = 0;
 	int scoreRender = 0;
@@ -730,6 +732,8 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				{
 					// Sprungfeder (Unten)
 					case 57:
+						playBlockSound(BLOCKS + 2);
+
 						player.v = 2 * -9 * ((double) blockSize / 48);
 						world[playerBlockY][playerBlockX] = 56;
 						break;
@@ -787,9 +791,8 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				// Lösche den Hintergrund
 				SDL_FillRect( screen, NULL, color );
 
-				// Wolken, TODO: Kamerabewegung
+				// Wolken
 				renderClouds(screen, camPosition.x - camPositionXold);
-
 
 				// Zeichne alle Blöcke
 				for(y = 0; y < res.height/blockSize; y++)

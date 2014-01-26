@@ -1,5 +1,5 @@
 #define BLOCKS 100
-#define ANIMATIONS 2
+#define ANIMATIONS 3
 
 void initializeSounds();
 void startMusic();
