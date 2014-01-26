@@ -670,26 +670,25 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				playerBlockX = (player.posX + player.sizeX / 2) / blockSize;
 				playerBlockY = (player.posY + player.sizeY / 2) / blockSize;
 
+				// spiele Block sound ab
+				playBlockSound(world[playerBlockY][playerBlockX]);
 				switch(world[playerBlockY][playerBlockX])
 				{
 					// Goldene Münze
 					case 50:
 						world[playerBlockY][playerBlockX] = 255;
-						playCoinSound(0);
 						score += 50;
 						break;
 
 					// Silberne Münze
 					case 51:
 						world[playerBlockY][playerBlockX] = 255;
-						playCoinSound(1);
 						score += 30;
 						break;
 
 					// Bronzefarbene Münze
 					case 52:
 						world[playerBlockY][playerBlockX] = 255;
-						playCoinSound(2);
 						score += 15;
 						break;
 
@@ -697,6 +696,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 					case 53:
 						if(player.v > 0)
 						{
+							playBlockSound(BLOCKS);
 							world[playerBlockY][playerBlockX] = 54;
 
 							triggerRun(triggerList, &world[0][0], playerBlockX, playerBlockY);
@@ -751,6 +751,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 					{
 						if((hitbox == 4 || hitbox == 8 || hitbox == 12) && player.v > 0)
 						{
+							playBlockSound(BLOCKS + 1);
 							player.v = -9 * ((double) blockSize / 48);
 
 							struct objectListElement *tmp = liste->next;

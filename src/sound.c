@@ -3,6 +3,10 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_mixer.h>
 
+#include "sound.h"
+
+Mix_Chunk *sound[BLOCKS + ANIMATIONS];
+
 void initializeSounds()
 {
 	int audioRate = 22050;
@@ -13,6 +17,14 @@ void initializeSounds()
 	if(Mix_OpenAudio(audioRate, audioFormat, audioChannels, audioBuffers) != 0) {
 		fprintf(stderr, "Unable to initialize audio: %s\n", Mix_GetError());
 		exit(1);
+	}
+
+	/* ---- lade Blocksounds ---- */
+	for (int i = 0; i < BLOCKS + ANIMATIONS; i++)
+	{
+		char file[40];
+		sprintf(file, "resources/sounds/%d.ogg", i);
+		sound[i] = Mix_LoadWAV(file);
 	}
 }
 
@@ -43,20 +55,13 @@ void playGameMusic()
 	Mix_FadeInMusic(music, -1, 500);
 }
 
-void playCoinSound(char num)
+void playBlockSound(unsigned int num)
 {
-	char file[40];
-	sprintf(file, "resources/sounds/8_bit_coins/coin%d.ogg", (int) num + 1);
-	Mix_Chunk *sound;
-	sound = Mix_LoadWAV(file);
-	if(sound == NULL) {
-		fprintf(stderr, "Unable to load WAV file (%s): %s\n", file, Mix_GetError());
-	}
-
-	int channel;
-
-	channel = Mix_PlayChannel(-1, sound, 0);
-	if(channel == -1) {
-		fprintf(stderr, "Unable to play WAV file: %s\n", Mix_GetError());
+	if (sound[num] != NULL && num < BLOCKS + ANIMATIONS)
+	{
+		int channel = Mix_PlayChannel(-1, sound[num], 0);
+		if(channel == -1) {
+			fprintf(stderr, "Unable to play WAV file: %s\n", Mix_GetError());
+		}
 	}
 }
