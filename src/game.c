@@ -610,7 +610,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	// ============================== KAMERA ==============================
 	// Variable ist Global
 	camPosition.x = 0;
-
+	int camPositionXold = 0;
 
 	// ============================== PUNKTE ==============================
 	score = 0;
@@ -661,7 +661,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				// Spieler in vertikaler Richtung aus der Welt
 				if(player.posY < 0-blockSize || player.posY > worldSizeY*blockSize)
 				{
-					exitCode =  GAME_OVER;
+					exitCode = GAME_OVER;
 					goto cleanGame;
 				}
 
@@ -711,12 +711,6 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 						goto cleanGame;
 						break;
 
-					// Sprungfeder (Unten)
-					case 57:
-						player.v = 2 * -9 * ((double) blockSize / 48);
-						world[playerBlockY][playerBlockX] = 56;
-						break;
-
 					// Leere Blöcke
 					case 255:
 						if(playerBlockX != playerBlockXold || playerBlockY != playerBlockYold)
@@ -733,7 +727,13 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				playerBlockX = (player.posX + player.sizeX / 2) / blockSize;
 				playerBlockY = (player.posY + player.sizeY - 1)    / blockSize;
 				switch(world[playerBlockY][playerBlockX])
-				{ 
+				{
+					// Sprungfeder (Unten)
+					case 57:
+						player.v = 2 * -9 * ((double) blockSize / 48);
+						world[playerBlockY][playerBlockX] = 56;
+						break;
+
 					// Sprungfeder (Oben)
 					case 56:
 						if(player.v > 0)
@@ -773,6 +773,8 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				}
 
 				// Kamera
+				camPositionXold = camPosition.x;
+
 				camPosition.x += ((player.posX - res.width / 2 + blockSize / 2) - camPosition.x) / 10;
 
 				if(camPosition.x < 0)
@@ -786,7 +788,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 				SDL_FillRect( screen, NULL, color );
 
 				// Wolken, TODO: Kamerabewegung
-				renderClouds(screen, 0);
+				renderClouds(screen, camPosition.x - camPositionXold);
 
 
 				// Zeichne alle Blöcke
