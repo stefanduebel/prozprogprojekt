@@ -98,7 +98,7 @@ int main( int argc, char *argv[] )
 	SDL_ShowCursor(0);
 
 	initializeSounds();
-	playMenuMusic();
+	startMusic();
 
 	initializeClouds();
 
@@ -123,9 +123,7 @@ int main( int argc, char *argv[] )
 			default:
 				if (returnValue >= LEVEL_OFFSET && returnValue < LEVEL_OFFSET + MAX_LEVEL)
 				{
-					playGameMusic();
 					returnValue = addScore(screen, startGame (screen, event, res, returnValue - LEVEL_OFFSET), event, &highscore);
-					playMenuMusic();
 				}
 				else if (returnValue <= EXIT_GAME)
 				{

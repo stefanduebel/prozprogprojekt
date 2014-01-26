@@ -3,6 +3,5 @@ Was					Lizenz					Link
 Grafiken:			CC-0 (public domain)	kenney.nl (http://opengameart.org/content/platformer-art-complete-pack-often-updated)
 Menü-Musik:			CC-by 3.0				http://opengameart.org/content/wasteland-overdrive
 8-bit-coins			CC-0						http://opengameart.org/content/10-8bit-coin-sounds
-
-
-Spiel-Musik			böse						youtube (8-bit Version von Eluveitie Inis Mona)
+	verwendet für Schalter, Feder und Gegner
+Münze					CC-by 3.0				http://soundbible.com/2072-Shell-Falling.html

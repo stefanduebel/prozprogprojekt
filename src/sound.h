@@ -2,7 +2,6 @@
 #define ANIMATIONS 2
 
 void initializeSounds();
-void playMenuMusic();
+void startMusic();
 void stopMusic();
-void playGameMusic();
 void playBlockSound(unsigned int num);
