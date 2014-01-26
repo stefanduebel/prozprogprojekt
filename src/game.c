@@ -489,7 +489,7 @@ int startGame(SDL_Surface *screen, SDL_Event event, struct resolution res, int l
 	player.sizeX     = ((double) 36/48) * blockSize;
 	player.sizeY     = blockSize;
 	player.v         = 0;
-	player.moveDir   = 0;
+	player.moveDir   = 1;
 	player.moveSpeed = 0;
 	player.frame     = 0;
 
