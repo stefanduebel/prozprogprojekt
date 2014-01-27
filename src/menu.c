@@ -113,7 +113,7 @@ int drawMenu(SDL_Surface *screen, SDL_Event event)
 										break;
 
 									case 3:
-										firstItem = initializeListMenu((char * []){"HD-1080p", "HD-720p", "WGA", "VGA", "Fullscreen", "zurueck"}, 6);
+										firstItem = initializeListMenu((char * []){"HD-1080p", "HD-720p", "WGA", "VGA", "Fullscreen", "zurück"}, 6);
 										selectedItem = renderMenu(menuSurface, 0, 0, firstItem);
 										menuType = SETTINGS_MENU;
 										break;
@@ -376,7 +376,7 @@ int renderMenu(SDL_Surface *surface, int changeH, int changeV, menu *menu)
 		if (item->description != NULL && i == menu->selected)
 		{
 			SDL_Color color = {255,255,255,0};
-			SDL_Surface *text = TTF_RenderText_Solid(font, item->description, color);
+			SDL_Surface *text = TTF_RenderUTF8_Solid(font, item->description, color);
 			SDL_Rect position;
 			position.y = res.height - MENU_PADDING - text->clip_rect.h;
 			position.x = (res.width / 2) - (text->clip_rect.w / 2);
@@ -399,9 +399,9 @@ menuItem *createItem (const char *text)
 
 	if (text != NULL)
 	{
-		SDL_Color color[2] = {{255,255,255,0},{100,100,100,0}};
-		item->selected = TTF_RenderText_Solid(font, text, color[1]);
-		item->unselected = TTF_RenderText_Solid(font, text, color[0]);
+		SDL_Color color[] = {{255,255,255,0},{100,100,100,0}};
+		item->selected = TTF_RenderUTF8_Solid(font, text, color[1]);
+		item->unselected = TTF_RenderUTF8_Solid(font, text, color[0]);
 	}
 
 	item->description = NULL;
