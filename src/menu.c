@@ -313,6 +313,10 @@ void renderClouds(SDL_Surface *surface, int camShift)
 		{
 			clouds[i].position = 0 - (((double) clouds[i].surface->clip_rect.w) / surface->clip_rect.w);
 		}
+		else if (clouds[i].position < (- (((double) clouds[i].surface->clip_rect.w) / surface->clip_rect.w)))
+		{
+			clouds[i].position = 1;
+		}
 	}
 }
 
