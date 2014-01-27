@@ -22,7 +22,8 @@
 #include "highscore.h"
 #include "sound.h"
 
-#define FONT_SIZE 30
+#define FONT_SIZE_BIG 30
+#define FONT_SIZE_SMALL 16
 
 Uint32 generate_userevent (Uint32 intervall, void *parameter)
 {
@@ -60,8 +61,11 @@ int main( int argc, char *argv[] )
 		exit(1);
 	}
 
-	font = TTF_OpenFont("resources/fonts/DejaVuSans.ttf", FONT_SIZE);
-	if (font == NULL)
+	fontBig = TTF_OpenFont("resources/fonts/DejaVuSans.ttf", FONT_SIZE_BIG);
+	fontSmall = TTF_OpenFont("resources/fonts/DejaVuSans.ttf", FONT_SIZE_SMALL);
+	TTF_SetFontStyle(fontSmall, TTF_STYLE_BOLD);
+	font = fontBig;
+	if (fontBig == NULL || fontSmall == NULL)
 	{
 		printf("TTF_OpenFont() Failed: %s\n", TTF_GetError());
 		TTF_Quit();

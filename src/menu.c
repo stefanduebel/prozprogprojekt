@@ -139,6 +139,7 @@ int drawMenu(SDL_Surface *screen, SDL_Event event)
 
 									case 2:
 										setGraphicsMode(screen, 800, 480, 0);
+										font = fontSmall;
 										break;
 
 									case 3:
@@ -456,4 +457,6 @@ void setGraphicsMode(SDL_Surface *screen, int width, int height, char toggleFull
 		screen = SDL_SetVideoMode( res.width, res.height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
 	else
 		screen = SDL_SetVideoMode( res.width, res.height, SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF);
+
+	font = (res.height > 600) ? fontBig : fontSmall;
 }
