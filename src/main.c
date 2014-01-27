@@ -134,6 +134,9 @@ int main( int argc, char *argv[] )
 					printf("Spiel beenden\n");
 					freeHighscore(highscore);
 					freeAudio();
+					TTF_CloseFont(fontBig);
+					TTF_CloseFont(fontSmall);
+					TTF_Quit();
 					SDL_Quit();
 					exit(returnValue - EXIT_GAME);
 				}
