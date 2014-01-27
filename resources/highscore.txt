@@ -1,6 +1,3 @@
 Stefan,666
 Murat,555
 Daniel,444
-STEFAN,430
-R,305
-DIPTVXZBB,170

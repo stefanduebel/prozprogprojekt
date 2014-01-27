@@ -46,7 +46,22 @@ void writeHighscore (struct highscoreItem *highscoreList);
  */
 void insertHighscore (struct highscoreItem **highscoreList, char name[], unsigned int points);
 
+/**
+ * Fragt den Spieler nach seinem Namen und fügt den Highscore zur Liste hinzu
+ *
+ * @param screen		Zeiger auf die SDL_Surface auf welche der Eingabedialog gezeichnet werden soll
+ * @param points		Punktzahl (Return-Code des Spieles)
+ * @param event		SDL_Event für Timer und Tastenevents
+ * @param highscore	Highscore Liste
+ *
+ * @return	Flags zum weiteren Verarbeiten
+ */
 int addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscoreItem **highscore);
 
+/**
+ * Gibt den von der HihscoreListe belegten Speicher frei
+ *
+ * @param highscoreList	Zeiger auf das erste zu löschende Listenelement
+ */
 void freeHighscore(struct highscoreItem *highscoreList);
 
