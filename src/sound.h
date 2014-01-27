@@ -5,3 +5,4 @@ void initializeSounds();
 void startMusic();
 void stopMusic();
 void playBlockSound(unsigned int num);
+void freeAudio();

@@ -129,9 +129,8 @@ int main( int argc, char *argv[] )
 				{
 					printf("Spiel beenden\n");
 					freeHighscore(highscore);
+					freeAudio();
 					SDL_Quit();
-					Mix_CloseAudio();
-					Mix_Quit();
 					exit(returnValue - EXIT_GAME);
 				}
 				else

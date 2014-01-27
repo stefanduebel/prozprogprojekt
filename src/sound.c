@@ -55,3 +55,15 @@ void playBlockSound(unsigned int num)
 		}
 	}
 }
+
+void freeAudio()
+{
+	for (int i = 0; i <= BLOCKS + ANIMATIONS; i++)
+	{
+		Mix_FreeChunk(sound[i]);
+		sound[i] = NULL;
+	}
+	Mix_HaltMusic();
+	Mix_CloseAudio();
+	Mix_Quit();
+}
