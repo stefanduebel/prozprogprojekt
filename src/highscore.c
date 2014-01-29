@@ -285,24 +285,62 @@ int addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscoreI
 
 					// rendere Text auf askNameSurface
 					CLEAR_SURFACE(askNameSurface);
-					SDL_Color color = {100,100,100,0};
-					SDL_Surface *tmp = TTF_RenderText_Solid(font, name, color);
+					SDL_Color color[] = {{100,100,100,0}, {255,0,0,0}};
+					char *namePart[3];
+					namePart[0] = (char *) malloc((currentLetter+2) * sizeof(char));
+					namePart[1] = (char *) malloc(2 * sizeof(char));
+
+					if (namePart[0] == NULL || namePart[1] == NULL)
+						return FAILURE;
+
+					namePart[0][0] = 0;
+					for (int i = 0; i < currentLetter; i++)
+					{
+						namePart[0][i] = name[i];
+						namePart[0][i+1] = 0;
+					}
+
+					namePart[1][0] = name[currentLetter]; namePart[1][1] = 0;
+
+					namePart[2] = &(name[currentLetter+1]);
+
+					SDL_Surface *partSurface[3];
+					int nameWidth = 0, nameHeight = 0;
+					for (int i = 0; i < 3; i++)
+					{
+						if (namePart[i][0] != 0)
+						{
+							partSurface[i] = TTF_RenderText_Solid(font, namePart[i], color[(i == 1)]);
+							nameWidth += partSurface[i]->clip_rect.w;
+							nameHeight = MAX(nameHeight, partSurface[i]->clip_rect.h);
+						}
+						else
+							partSurface[i] = NULL;
+					}
+
 					SDL_Rect pos;
-					pos.x = (screen->clip_rect.w - tmp->clip_rect.w) / 2;
-					pos.y = (screen->clip_rect.h - tmp->clip_rect.h) / 2 + tmp->clip_rect.h;
-					SDL_BlitSurface(tmp, NULL, askNameSurface, &pos);
+					pos.x = (screen->clip_rect.w - nameWidth) / 2;
+					pos.y = (screen->clip_rect.h - nameHeight) / 2 + nameHeight;
 
-					SDL_FreeSurface(screen);
-
-					tmp = TTF_RenderText_Solid(font, "Bitte Namen eingeben", color);
-					pos.x = (screen->clip_rect.w - tmp->clip_rect.w) / 2;
-					pos.y = (screen->clip_rect.h - tmp->clip_rect.h) / 2 - tmp->clip_rect.h;
-					SDL_BlitSurface(tmp, NULL, askNameSurface, &pos);
-
-					SDL_FreeSurface(tmp);
+					for (int i = 0; i < 3; i++)
+					{
+						if (partSurface[i] != NULL)
+						{
+							SDL_BlitSurface(partSurface[i], NULL, askNameSurface, &pos);
+							pos.x += partSurface[i]->clip_rect.w;
+						}
+					}
 
 					SDL_BlitSurface(askNameSurface, NULL, screen, NULL);
 					SDL_Flip(screen);
+
+					for (int i = 0; i < 3; i++)
+					{
+						if (partSurface[i] != NULL)
+							SDL_FreeSurface(partSurface[i]);
+					}
+					free(namePart[0]);
+					free(namePart[1]);
 					break;
 
 				case SDL_QUIT:
@@ -365,7 +403,7 @@ int addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscoreI
 						case SDLK_LEFT:
 							if (currentLetter > 0)
 							{
-								name[currentLetter] = 0;
+								//~name[currentLetter] = 0;
 								currentLetter--;
 							}
 							break;
