@@ -248,6 +248,7 @@ void insertHighscore (struct highscoreItem **highscoreList, char name[], unsigne
 int addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscoreItem **highscore)
 {
 	int pointsMin = 0;
+	int letterOffset = 0;
 	if (*highscore != NULL)
 	{
 		struct highscoreItem *highscoreNew = *highscore;
@@ -308,20 +309,33 @@ int addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscoreI
 					SDL_Quit();
 					exit(0);
 
+				case SDL_KEYUP:
+					switch (event.key.keysym.sym)
+					{
+						case SDLK_LSHIFT:
+						case SDLK_RSHIFT:
+							letterOffset = 0;
+							break;
+
+						default:
+							break;
+					}
+				break;
+
 				case SDL_KEYDOWN:
 					switch(event.key.keysym.sym)
 					{
 						// Pfeil runter
 						case SDLK_DOWN:
 							name[currentLetter]--;
-							if (name[currentLetter] < 'A')
+							if (name[currentLetter] < 'A' || name[currentLetter] == -1)
 								name[currentLetter] = 'Z';
 							break;
 
 						// Pfeil hoch
 						case SDLK_UP:
 							name[currentLetter]++;
-							if (name[currentLetter] > 'Z')
+							if (name[currentLetter] > 'Z' || name[currentLetter] == 1)
 								name[currentLetter] = 'A';
 							break;
 
@@ -333,12 +347,6 @@ int addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscoreI
 									currentLetter = 9;
 							break;
 
-						case SDLK_LEFT:
-							currentLetter--;
-							if (currentLetter < 0)
-								currentLetter = 0;
-							break;
-
 						case SDLK_RETURN:
 							insertHighscore(highscore, name, points);
 							return MENU;
@@ -346,7 +354,36 @@ int addScore(SDL_Surface *screen, int points, SDL_Event event, struct highscoreI
 						case SDLK_ESCAPE:
 							return MENU;
 
+						case SDLK_BACKSPACE:
+							if (currentLetter > 0)
+							{
+								name[currentLetter - 1] = 0;
+								currentLetter--;
+							}
+							break;
+
+						case SDLK_LEFT:
+							if (currentLetter > 0)
+							{
+								name[currentLetter] = 0;
+								currentLetter--;
+							}
+							break;
+
+						case SDLK_LSHIFT:
+						case SDLK_RSHIFT:
+							letterOffset = ('A' - 'a');
+							break;
+
 						default:
+							if (event.key.keysym.sym >= 'a' && event.key.keysym.sym <= 'z')
+							{
+								name[currentLetter] = event.key.keysym.sym + letterOffset;
+								currentLetter++;
+								if (currentLetter > 9)
+									currentLetter = 9;
+								letterOffset = 0;
+							}
 							break;
 					}
 			}
